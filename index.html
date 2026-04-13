@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Join Chat</title>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <style>
+    body {
+      font-family: Arial;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Enter Chat</h2>
+
+  <input id="username" placeholder="Username">
+
+  <div class="cf-turnstile" 
+       data-sitekey="YOUR_SITE_KEY"
+       data-callback="onSuccess">
+  </div>
+
+  <button id="joinBtn" disabled onclick="joinChat()">Join</button>
+</div>
+
+<script>
+let verified = false;
+
+function onSuccess(token) {
+  verified = true;
+  document.getElementById("joinBtn").disabled = false;
+}
+
+function joinChat() {
+  const username = document.getElementById("username").value;
+
+  if (!username || !verified) {
+    alert("Complete all fields");
+    return;
+  }
+
+  localStorage.setItem("chat_username", username);
+
+  window.location.href = "chat.html";
+}
+</script>
+
+</body>
+</html>
