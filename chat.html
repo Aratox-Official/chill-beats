@@ -95,7 +95,7 @@ function addMessage(data) {
 }
 
 function connect() {
-  const WS_URL = `wss://purple-base-c918.workers.dev/ws?username=${encodeURIComponent(username)}&session=${sessionId}`;
+  const WS_URL = `wss://purple-base-c918.aratox-official.workers.dev/ws?username=${encodeURIComponent(username)}&session=${sessionId}`;
   socket = new WebSocket(WS_URL);
 
   socket.onopen = () => {
