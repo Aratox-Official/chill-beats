@@ -4,9 +4,7 @@
   <title>Chat</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -69,9 +67,7 @@ if (!username) {
   window.location.href = "index.html";
 }
 
-const WS_URL = `wss://purple-base-c918.aratox-business.workers.dev/ws?username=${encodeURIComponent(username)}`;
-const socket = new WebSocket(WS_URL);
-
+let socket;
 const chat = document.getElementById("chat");
 const messageInput = document.getElementById("message");
 
@@ -91,9 +87,40 @@ function addMessage(data) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-socket.onmessage = (event) => {
-  addMessage(JSON.parse(event.data));
-};
+function connect() {
+  const WS_URL = `wss://purple-base-c918.aratox-business.workers.dev/ws?username=${encodeURIComponent(username)}`;
+  socket = new WebSocket(WS_URL);
+
+  socket.onopen = () => {
+    console.log("Connected");
+  };
+
+  socket.onmessage = (event) => {
+    addMessage(JSON.parse(event.data));
+  };
+
+  socket.onclose = () => {
+    addMessage({
+      type: "system",
+      message: "Disconnected... reconnecting...",
+      time: Date.now()
+    });
+
+    setTimeout(connect, 2000);
+  };
+
+  socket.onerror = () => {
+    socket.close();
+  };
+}
+
+connect();
+
+setInterval(() => {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ type: "ping" }));
+  }
+}, 20000);
 
 function sendMessage() {
   const message = messageInput.value.trim();
@@ -113,18 +140,6 @@ messageInput.addEventListener("keydown", (e) => {
     sendMessage();
   }
 });
-
-socket.onopen = () => {
-  console.log("Connected to chat");
-};
-
-socket.onclose = () => {
-  addMessage({
-    type: "system",
-    message: "Disconnected from server",
-    time: Date.now()
-  });
-};
 </script>
 
 </body>
