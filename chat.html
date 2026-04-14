@@ -67,6 +67,13 @@ if (!username) {
   window.location.href = "index.html";
 }
 
+let sessionId = localStorage.getItem("chat_session");
+
+if (!sessionId) {
+  sessionId = crypto.randomUUID();
+  localStorage.setItem("chat_session", sessionId);
+}
+
 let socket;
 const chat = document.getElementById("chat");
 const messageInput = document.getElementById("message");
@@ -88,7 +95,7 @@ function addMessage(data) {
 }
 
 function connect() {
-  const WS_URL = `wss://purple-base-c918.aratox-business.workers.dev/ws?username=${encodeURIComponent(username)}`;
+  const WS_URL = `wss://purple-base-c918.workers.dev/ws?username=${encodeURIComponent(username)}&session=${sessionId}`;
   socket = new WebSocket(WS_URL);
 
   socket.onopen = () => {
@@ -100,12 +107,6 @@ function connect() {
   };
 
   socket.onclose = () => {
-    addMessage({
-      type: "system",
-      message: "Disconnected... reconnecting...",
-      time: Date.now()
-    });
-
     setTimeout(connect, 2000);
   };
 
