@@ -91,7 +91,7 @@ function connect() {
   };
 
   socket.onclose = () => {
-    console.log("Connection lost. Retrying...");
+    console.log("Network connection lost. Attempting to reconnect...");
     setTimeout(connect, 2000);
   };
 
