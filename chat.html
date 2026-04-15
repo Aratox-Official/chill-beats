@@ -91,7 +91,7 @@ function connect() {
   };
 
   socket.onclose = () => {
-    console.log("Disconnected, attempting to reconnect...");
+    console.log("Connection lost. Retrying...");
     setTimeout(connect, 2000);
   };
 
@@ -101,6 +101,12 @@ function connect() {
 }
 
 connect();
+
+window.addEventListener("beforeunload", () => {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ type: "explicit_leave" }));
+  }
+});
 
 setInterval(() => {
   if (socket && socket.readyState === WebSocket.OPEN) {
