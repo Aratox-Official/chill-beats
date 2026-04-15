@@ -75,7 +75,7 @@
 </head>
 <body>
 
-<button id="themeToggle" onclick="toggleTheme()">Toggle Dark Mode</button>
+<button id="themeToggle" onclick="toggleTheme()">Dark Mode</button>
 
 <div id="chat"></div>
 
@@ -86,6 +86,7 @@
 
 <script>
 const username = localStorage.getItem("chat_username");
+const themeToggle = document.getElementById("themeToggle");
 
 if (!username) {
   window.location.href = "index.html";
@@ -97,11 +98,14 @@ const messageInput = document.getElementById("message");
 
 if (localStorage.getItem("theme") === "dark") {
   document.body.classList.add("dark-mode");
+  themeToggle.innerText = "Light Mode";
 }
 
 function toggleTheme() {
   const isDark = document.body.classList.toggle("dark-mode");
   localStorage.setItem("theme", isDark ? "dark" : "light");
+  
+  themeToggle.innerText = isDark ? "Light Mode" : "Dark Mode";
 }
 
 function addMessage(data) {
