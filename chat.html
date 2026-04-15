@@ -2,10 +2,8 @@
 <html>
 <head>
   <title>Chat</title>
-
   <style>
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: Arial;
@@ -14,13 +12,11 @@
       flex-direction: column;
       background: #fafafa;
     }
-
     #chat {
       flex: 1;
       overflow-y: auto;
       padding: 10px;
     }
-
     #inputBar {
       display: flex;
       gap: 10px;
@@ -28,29 +24,24 @@
       border-top: 1px solid #ddd;
       background: white;
     }
-
     #message {
       flex: 1;
       padding: 10px;
     }
-
     button {
       padding: 10px 15px;
       cursor: pointer;
     }
-
     .msg {
       margin: 6px 0;
       word-break: break-word;
     }
-
     .system {
       color: gray;
       font-style: italic;
     }
   </style>
 </head>
-
 <body>
 
 <div id="chat"></div>
@@ -100,12 +91,7 @@ function connect() {
   };
 
   socket.onclose = () => {
-    addMessage({
-      type: "system",
-      message: "Disconnected... reconnecting...",
-      time: Date.now()
-    });
-
+    console.log("Disconnected, attempting to reconnect...");
     setTimeout(connect, 2000);
   };
 
