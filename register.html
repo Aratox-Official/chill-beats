@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relay — Create Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0d; --paper: #f5f0e8; --cream: #ede7d9;
+      --accent: #c8502a; --accent-dim: #e8d5cc; --muted: #7a7060;
+      --border: #c5bba8; --surface: #fff; --green: #3a7d4a;
+    }
+
+    html, body { height: 100%; font-family: 'DM Mono', monospace; background: var(--paper); color: var(--ink); }
+
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px; opacity: 0.15;
+    }
+
+    .page { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; }
+
+    .wordmark { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.02em; margin-bottom: 4px; animation: fadeDown .5s ease both; }
+    .tagline  { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 36px; animation: fadeDown .5s .07s ease both; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 2px;
+      padding: 36px 40px 40px; width: min(380px, 92vw);
+      box-shadow: 4px 4px 0 var(--border), 8px 8px 0 var(--accent-dim);
+      animation: fadeUp .5s .12s ease both;
+    }
+
+    .card-label { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 22px; display: flex; align-items: center; gap: 10px; }
+    .card-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+    .field label { font-size: .62rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+
+    .field input {
+      font-family: 'DM Mono', monospace; font-size: .9rem; padding: 11px 14px;
+      border: 1px solid var(--border); background: var(--paper); color: var(--ink);
+      border-radius: 2px; outline: none; transition: border-color .2s, box-shadow .2s; width: 100%;
+    }
+    .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .field input::placeholder { color: var(--border); }
+    .field input.valid   { border-color: var(--green); }
+    .field input.invalid { border-color: var(--accent); }
+
+    .hint { font-size: .6rem; color: var(--muted); letter-spacing: .04em; margin-top: 3px; }
+
+    /* Password strength meter */
+    .strength-bar { height: 3px; border-radius: 2px; background: var(--cream); margin-top: 6px; overflow: hidden; }
+    .strength-fill { height: 100%; width: 0; transition: width .3s, background .3s; border-radius: 2px; }
+
+    .error   { font-size: .68rem; color: var(--accent); min-height: 1.2em; margin: 2px 0 10px; letter-spacing: .04em; }
+    .success { font-size: .68rem; color: var(--green);  min-height: 1.2em; margin: 2px 0 10px; letter-spacing: .04em; }
+
+    .btn {
+      font-family: 'DM Mono', monospace; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase;
+      width: 100%; padding: 13px; background: var(--ink); color: var(--paper);
+      border: 1px solid var(--ink); border-radius: 2px; cursor: pointer;
+      transition: background .15s, transform .1s; margin-top: 6px;
+    }
+    .btn:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:disabled { background: var(--cream); color: var(--border); border-color: var(--border); cursor: not-allowed; }
+
+    .footer-link { margin-top: 24px; font-size: .68rem; color: var(--muted); text-align: center; animation: fadeUp .5s .25s ease both; }
+    .footer-link a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-dim); padding-bottom: 1px; }
+    .footer-link a:hover { border-bottom-color: var(--accent); }
+
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(12px);  } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="wordmark">Relay</div>
+  <div class="tagline">Create your account</div>
+
+  <div class="card">
+    <div class="card-label">Register</div>
+
+    <div class="field">
+      <label for="username">Username</label>
+      <input id="username" type="text" placeholder="your_handle" autocomplete="username" autocorrect="off" spellcheck="false" maxlength="32">
+      <div class="hint">2–32 chars · letters, numbers, _ - . only</div>
+    </div>
+
+    <div class="field">
+      <label for="displayName">Display name <span style="opacity:.5;font-size:.55rem">(optional)</span></label>
+      <input id="displayName" type="text" placeholder="Your Name" autocomplete="name" maxlength="64">
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="Min. 8 characters" autocomplete="new-password">
+      <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+    </div>
+
+    <div class="field">
+      <label for="confirm">Confirm password</label>
+      <input id="confirm" type="password" placeholder="Repeat password" autocomplete="new-password">
+    </div>
+
+    <div class="error" id="errorMsg"></div>
+
+    <button class="btn" id="registerBtn" onclick="register()">Create Account →</button>
+  </div>
+
+  <div class="footer-link">Already have an account? <a href="index.html">Sign in</a></div>
+</div>
+
+<script src="relay-config.js"></script>
+<script>
+  const usernameEl    = document.getElementById('username');
+  const displayNameEl = document.getElementById('displayName');
+  const passwordEl    = document.getElementById('password');
+  const confirmEl     = document.getElementById('confirm');
+  const errorEl       = document.getElementById('errorMsg');
+  const registerBtn   = document.getElementById('registerBtn');
+  const strengthFill  = document.getElementById('strengthFill');
+
+  // Password strength
+  passwordEl.addEventListener('input', () => {
+    const v = passwordEl.value;
+    let score = 0;
+    if (v.length >= 8)  score++;
+    if (v.length >= 12) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^a-zA-Z0-9]/.test(v)) score++;
+    const pct   = (score / 5) * 100;
+    const color = score <= 1 ? '#c8502a' : score <= 3 ? '#b5892a' : '#3a7d4a';
+    strengthFill.style.width    = pct + '%';
+    strengthFill.style.background = color;
+  });
+
+  function setError(msg)  { errorEl.className = 'error';   errorEl.textContent = msg; }
+  function setSuccess(msg){ errorEl.className = 'success'; errorEl.textContent = msg; }
+  function setLoading(v) {
+    registerBtn.disabled    = v;
+    registerBtn.textContent = v ? 'Creating account…' : 'Create Account →';
+  }
+
+  async function register() {
+    setError('');
+    const username    = usernameEl.value.trim();
+    const displayName = displayNameEl.value.trim();
+    const password    = passwordEl.value;
+    const confirm     = confirmEl.value;
+
+    if (!username || !password) { setError('Username and password are required.'); return; }
+    if (!/^[a-zA-Z0-9_\-.]{2,32}$/.test(username)) {
+      setError('Username: 2–32 chars, letters/numbers/_ -. only'); return;
+    }
+    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    if (password !== confirm) { setError('Passwords do not match.'); return; }
+
+    setLoading(true);
+    try {
+      const res  = await fetch(`${Relay.api}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, displayName: displayName || username }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || 'Registration failed.'); setLoading(false); return; }
+
+      Relay.saveSession(data.token, { username: data.username, displayName: data.displayName });
+      setSuccess('Account created! Redirecting…');
+      setTimeout(() => { window.location.href = 'chat.html'; }, 800);
+    } catch {
+      setError('Network error — please try again.');
+      setLoading(false);
+    }
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') register(); });
+</script>
+</body>
+</html>
