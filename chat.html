@@ -10,497 +10,307 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:         #313338;
-      --bg-dark:    #2b2d31;
-      --bg-darker:  #1e1f22;
-      --surface:    #383a40;
-      --border:     #3f4147;
-      --text:       #dbdee1;
-      --text-muted: #949ba4;
-      --text-dim:   #6d6f78;
-      --accent:     #5865f2;
-      --accent-dim: #4752c4;
-      --green:      #23a55a;
-      --red:        #f23f43;
-      --mention:    rgba(88,101,242,0.1);
+      --ink: #0d0d0d; --paper: #f5f0e8; --cream: #ede7d9;
+      --accent: #c8502a; --accent-dim: #e8d5cc; --muted: #7a7060;
+      --border: #c5bba8; --surface: #fff;
+    }
+
+    [data-theme="dark"] {
+      --ink: #f0ebe0; --paper: #141210; --cream: #1e1b17;
+      --accent: #e0673d; --accent-dim: #3a2218; --muted: #8a8070;
+      --border: #3a342a; --surface: #1e1b17;
     }
 
     html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
+      height: 100%; width: 100%; overflow: hidden;
       font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
+      background: var(--paper); color: var(--ink);
+      transition: background 0.2s, color 0.2s;
     }
 
-    /* -- App shell -- */
     .app {
-      height: 100vh;
-      width: 100vw;
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      grid-template-rows: 1fr;
+      height: 100vh; width: 100vw;
+      display: flex; flex-direction: column;
     }
 
-    /* -- Sidebar -- */
-    .sidebar {
-      background: var(--bg-dark);
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid var(--bg-darker);
-      overflow: hidden;
+    /* -- Header -- */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 48px; flex-shrink: 0;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      gap: 12px;
     }
 
-    .server-header {
-      padding: 0 16px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--bg-darker);
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      flex-shrink: 0;
+    .header-left { display: flex; align-items: baseline; gap: 12px; }
+
+    .logo {
+      font-family: 'DM Serif Display', serif; font-size: 1.4rem;
+      letter-spacing: -0.02em; color: var(--ink); text-decoration: none;
     }
 
-    .server-header:hover { background: var(--surface); }
-
-    .channels-section {
-      padding: 16px 8px 4px;
-      flex: 1;
-      overflow-y: auto;
+    .room-tag {
+      font-family: 'DM Mono', monospace; font-size: .6rem;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+      border: 1px solid var(--border); padding: 2px 8px; border-radius: 2px;
     }
 
-    .channels-label {
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      padding: 0 8px;
-      margin-bottom: 4px;
+    .header-right { display: flex; align-items: center; gap: 8px; }
+
+    .user-chip {
+      display: flex; align-items: center; gap: 7px;
+      font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted);
+      padding: 4px 10px; border: 1px solid var(--border); border-radius: 2px;
+      background: var(--cream); position: relative; cursor: pointer;
+      transition: border-color .15s;
+    }
+    .user-chip:hover { border-color: var(--ink); }
+
+    .chip-avatar {
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .58rem; font-weight: 600; color: #fff; flex-shrink: 0;
     }
 
-    .channel-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: background 0.1s, color 0.1s;
+    /* Dropdown */
+    .dropdown {
+      position: absolute; top: calc(100% + 6px); right: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 2px; box-shadow: 4px 4px 0 var(--border);
+      min-width: 160px; z-index: 100; display: none;
     }
-
-    .channel-item:hover { background: var(--surface); color: var(--text); }
-    .channel-item.active { background: var(--surface); color: var(--text); }
-
-    .channel-item .hash {
-      font-size: 1.1rem;
-      opacity: 0.6;
-      flex-shrink: 0;
+    .dropdown.open { display: block; }
+    .dropdown-header { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    .dropdown-header .dn { font-size: .82rem; font-weight: 600; }
+    .dropdown-header .un { font-size: .65rem; color: var(--muted); margin-top: 1px; font-family: 'DM Mono', monospace; }
+    .dropdown-item {
+      display: block; width: 100%; text-align: left; padding: 9px 14px;
+      font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted);
+      background: none; border: none; border-top: 1px solid var(--border);
+      cursor: pointer; letter-spacing: .06em; transition: background .1s, color .1s;
     }
+    .dropdown-item:hover { background: var(--cream); color: var(--ink); }
+    .dropdown-item.danger:hover { color: var(--accent); }
 
-    /* User panel at bottom of sidebar */
-    .user-panel {
-      padding: 8px;
-      background: var(--bg-darker);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
+    .icon-btn {
+      background: none; border: 1px solid var(--border); border-radius: 2px;
+      color: var(--muted); cursor: pointer; padding: 5px 9px; font-size: .95rem;
+      transition: border-color .15s, color .15s, background .15s;
     }
+    .icon-btn:hover { border-color: var(--ink); color: var(--ink); background: var(--cream); }
 
-    .user-panel .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #fff;
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    .user-panel .avatar::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      right: -1px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--green);
-      border: 2px solid var(--bg-darker);
-    }
-
-    .user-panel .user-info { flex: 1; overflow: hidden; }
-    .user-panel .user-name { font-size: 0.82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-panel .user-tag  { font-size: 0.7rem; color: var(--text-muted); }
-
-    .user-panel .panel-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 4px 6px;
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: background 0.1s, color 0.1s;
-    }
-    .user-panel .panel-btn:hover { background: var(--surface); color: var(--text); }
-
-    /* -- Main area -- */
-    .main {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      min-width: 0;
-    }
-
-    /* Channel header */
-    .channel-header {
-      height: 48px;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid var(--bg-darker);
-      flex-shrink: 0;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.2);
-    }
-
-    .channel-header .hash { font-size: 1.4rem; color: var(--text-muted); }
-    .channel-header .name { font-weight: 600; font-size: 0.95rem; }
-    .channel-header .divider { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
-    .channel-header .topic { font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .header-actions { margin-left: auto; display: flex; gap: 4px; }
-    .header-btn {
-      background: none; border: none; color: var(--text-muted);
-      cursor: pointer; padding: 6px; border-radius: 4px; font-size: 1rem;
-      transition: color 0.1s, background 0.1s;
-    }
-    .header-btn:hover { color: var(--text); background: var(--surface); }
-
-    /* Status bar */
+    /* -- Status bar -- */
     .status-bar {
-      padding: 2px 16px;
-      font-size: 0.68rem;
-      color: var(--text-dim);
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
+      padding: 3px 20px; font-family: 'DM Mono', monospace;
+      font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--muted); background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
     }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .status-dot.green { background: var(--green); }
-    .status-dot.red   { background: var(--red); animation: blink 1s ease-in-out infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.green { background: #4caf50; animation: blink 2.5s ease-in-out infinite; }
+    .status-dot.red   { background: #e74c3c; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     /* -- Messages -- */
     #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 0 8px;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
+      flex: 1; overflow-y: auto; padding: 16px 0 8px;
+      display: flex; flex-direction: column; min-height: 0;
     }
 
-    #chat::-webkit-scrollbar { width: 6px; }
-    #chat::-webkit-scrollbar-track { background: transparent; }
-    #chat::-webkit-scrollbar-thumb { background: var(--bg-darker); border-radius: 3px; }
-    #chat::-webkit-scrollbar-thumb:hover { background: var(--border); }
+    #chat::-webkit-scrollbar { width: 5px; }
+    #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* History separator */
     .history-separator {
       display: flex; align-items: center; gap: 10px;
-      margin: 8px 16px 16px;
-      font-size: 0.72rem; color: var(--text-dim); font-style: italic;
+      margin: 8px 20px 16px;
+      font-family: 'DM Mono', monospace; font-size: .6rem;
+      color: var(--accent); font-style: italic;
     }
     .history-separator::before, .history-separator::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
+      content: ''; flex: 1; height: 1px; background: var(--accent-dim);
     }
 
-    /* System message */
+    /* System messages */
     .system-msg {
-      padding: 2px 48px;
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      font-style: italic;
-      animation: fadeIn 0.15s ease;
+      padding: 2px 20px 2px 76px;
+      font-size: .78rem; color: var(--muted); font-style: italic;
+      animation: msgIn .15s ease;
     }
 
-    /* Message group - Discord style */
+    /* Message group */
     .msg-group {
-      padding: 2px 16px;
-      display: flex;
-      gap: 16px;
-      animation: fadeIn 0.15s ease;
-      position: relative;
+      padding: 2px 20px;
+      display: flex; gap: 16px;
+      animation: msgIn .15s ease;
     }
-
-    .msg-group:hover { background: rgba(0,0,0,0.06); }
-
+    .msg-group:hover { background: rgba(0,0,0,0.03); }
+    [data-theme="dark"] .msg-group:hover { background: rgba(255,255,255,0.03); }
     .msg-group.continued { padding-top: 1px; padding-bottom: 1px; }
+    .msg-group.history-msg { opacity: .55; }
 
-    @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes msgIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
 
-    /* Avatar column */
+    /* Avatar column - fixed 40px wide */
+    .msg-avatar-col {
+      width: 40px; flex-shrink: 0; padding-top: 2px;
+      display: flex; justify-content: center;
+    }
+
     .msg-avatar {
-      width: 40px;
-      flex-shrink: 0;
-      padding-top: 2px;
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 600; color: #fff; flex-shrink: 0;
     }
 
-    .msg-avatar .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #fff;
-      cursor: pointer;
+    /* Continued row: show mini timestamp on hover instead of avatar */
+    .msg-group.continued .msg-avatar { display: none; }
+    .mini-time {
+      display: none; font-family: 'DM Mono', monospace;
+      font-size: .6rem; color: var(--muted); white-space: nowrap;
+      opacity: 0; transition: opacity .1s; padding-top: 3px;
     }
-
-    .msg-avatar .avatar:hover { filter: brightness(0.85); }
-
-    /* In continued messages, show timestamp on hover instead of avatar */
-    .msg-group.continued .msg-avatar { display: flex; align-items: center; justify-content: flex-end; }
-    .msg-group.continued .avatar { display: none; }
-    .msg-group.continued .mini-time {
-      display: block;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.1s;
-      font-family: 'DM Mono', monospace;
-    }
+    .msg-group.continued .mini-time { display: block; }
     .msg-group.continued:hover .mini-time { opacity: 1; }
-    .mini-time { display: none; }
 
-    /* Message content column */
+    /* Content column */
     .msg-content { flex: 1; min-width: 0; }
 
     .msg-header {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      margin-bottom: 2px;
+      display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px;
     }
 
     .msg-author {
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      color: var(--text);
+      font-weight: 600; font-size: .94rem; cursor: default;
     }
-    .msg-author:hover { text-decoration: underline; }
 
     .msg-timestamp {
-      font-size: 0.68rem;
-      color: var(--text-dim);
-      font-family: 'DM Mono', monospace;
+      font-family: 'DM Mono', monospace; font-size: .65rem; color: var(--muted);
     }
 
     .msg-text {
-      font-size: 0.94rem;
-      line-height: 1.5;
-      color: var(--text);
-      word-break: break-word;
-      white-space: pre-wrap;
+      font-size: .92rem; line-height: 1.55;
+      color: var(--ink); word-break: break-word; white-space: pre-wrap;
     }
-
-    .msg-group.history-msg .msg-author,
-    .msg-group.history-msg .msg-text { opacity: 0.5; }
 
     /* -- Typing indicator -- */
     #typingIndicator {
-      height: 24px;
-      padding: 0 16px;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
+      height: 22px; padding: 0 20px 0 76px;
+      font-size: .75rem; color: var(--muted);
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
     }
 
     .typing-dots { display: inline-flex; gap: 3px; }
     .typing-dots span {
-      width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted);
+      width: 4px; height: 4px; border-radius: 50%; background: var(--muted);
       animation: dotBounce 1.3s ease-in-out infinite;
     }
-    .typing-dots span:nth-child(2) { animation-delay: 0.16s; }
-    .typing-dots span:nth-child(3) { animation-delay: 0.32s; }
+    .typing-dots span:nth-child(2) { animation-delay: .16s; }
+    .typing-dots span:nth-child(3) { animation-delay: .32s; }
     @keyframes dotBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
 
     /* -- Input area -- */
-    .input-area {
-      padding: 0 16px 20px;
-      flex-shrink: 0;
-    }
+    .input-area { padding: 0 20px 16px; flex-shrink: 0; }
 
     .input-box {
-      background: var(--surface);
-      border-radius: 8px;
-      display: flex;
-      align-items: flex-end;
-      gap: 0;
-      padding: 0 16px;
-      border: 1px solid transparent;
-      transition: border-color 0.15s;
+      display: flex; align-items: flex-end; gap: 10px;
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: 2px; padding: 0 14px;
+      transition: border-color .15s, box-shadow .15s;
     }
-
-    .input-box:focus-within { border-color: var(--accent); }
+    .input-box:focus-within {
+      border-color: var(--ink); box-shadow: 0 0 0 3px var(--accent-dim);
+    }
 
     #messageInput {
-      flex: 1;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.94rem;
-      padding: 11px 0;
-      background: none;
-      border: none;
-      color: var(--text);
-      outline: none;
-      resize: none;
-      min-height: 44px;
-      max-height: 200px;
-      line-height: 1.5;
+      flex: 1; font-family: 'DM Sans', sans-serif; font-size: .92rem;
+      padding: 11px 0; background: none; border: none; color: var(--ink);
+      outline: none; resize: none; min-height: 44px; max-height: 180px; line-height: 1.5;
     }
-
-    #messageInput::placeholder { color: var(--text-dim); }
+    #messageInput::placeholder { color: var(--border); }
 
     .send-btn {
-      background: none;
-      border: none;
-      color: var(--text-dim);
-      cursor: pointer;
-      padding: 8px 4px 8px 12px;
-      font-size: 1.2rem;
-      transition: color 0.1s;
-      flex-shrink: 0;
-      align-self: flex-end;
-      margin-bottom: 8px;
+      font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .08em;
+      padding: 7px 14px; background: var(--ink); color: var(--paper);
+      border: none; border-radius: 2px; cursor: pointer;
+      transition: background .15s; flex-shrink: 0; margin-bottom: 8px;
     }
-    .send-btn:hover { color: var(--accent); }
-    .send-btn:disabled { color: var(--border); cursor: not-allowed; }
+    .send-btn:hover { background: var(--accent); }
+    .send-btn:active { transform: scale(.97); }
 
     .input-footer {
-      padding: 4px 2px 0;
-      font-size: 0.68rem;
-      color: var(--text-dim);
-      display: flex;
-      justify-content: space-between;
+      padding: 4px 2px 0; font-family: 'DM Mono', monospace;
+      font-size: .6rem; color: var(--muted);
+      display: flex; justify-content: space-between;
     }
+    .char-warn { color: var(--accent); }
 
     /* -- Connecting overlay -- */
     #overlay {
-      position: fixed; inset: 0;
-      background: var(--bg);
+      position: fixed; inset: 0; background: var(--paper);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 16px;
-      z-index: 200; transition: opacity 0.3s;
+      z-index: 200; transition: opacity .3s;
     }
     #overlay.hidden { opacity: 0; pointer-events: none; }
-    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .overlay-text { font-size: 0.78rem; color: var(--text-muted); letter-spacing: 0.08em; }
-
-    /* -- Responsive - collapse sidebar on mobile -- */
-    @media (max-width: 600px) {
-      .app { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
+    .spinner {
+      width: 28px; height: 28px; border: 2px solid var(--border);
+      border-top-color: var(--ink); border-radius: 50%;
+      animation: spin .7s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
 <div id="overlay">
-  <div style="font-family:'DM Serif Display',serif;font-size:2rem;color:var(--text)">Relay</div>
+  <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--ink)">Relay</div>
   <div class="spinner"></div>
-  <div class="overlay-text">Connecting…</div>
+  <div style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Connecting…</div>
 </div>
 
 <div class="app">
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="server-header">
-      <span>Relay</span>
-      <span style="font-size:1.1rem">⌄</span>
+  <header>
+    <div class="header-left">
+      <span class="logo">Relay</span>
+      <span class="room-tag"># general</span>
     </div>
-
-    <div class="channels-section">
-      <div class="channels-label">Text Channels</div>
-      <div class="channel-item active">
-        <span class="hash">#</span>
-        <span>general</span>
+    <div class="header-right">
+      <div class="user-chip" id="userChip" onclick="toggleDropdown()">
+        <div class="chip-avatar" id="chipAvatar"></div>
+        <span id="chipName"></span>
+        <span style="font-size:.6rem;opacity:.5">▾</span>
+        <div class="dropdown" id="dropdown">
+          <div class="dropdown-header">
+            <div class="dn" id="dropDisplay"></div>
+            <div class="un" id="dropUser"></div>
+          </div>
+          <button class="dropdown-item" onclick="toggleTheme(); event.stopPropagation()">Toggle Theme</button>
+          <button class="dropdown-item danger" onclick="logout()">Sign Out</button>
+        </div>
       </div>
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">☽</button>
     </div>
+  </header>
 
-    <div class="user-panel">
-      <div class="avatar" id="sidebarAvatar" style="width:32px;height:32px;font-size:0.8rem;font-weight:600;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;"></div>
-      <div class="user-info">
-        <div class="user-name" id="sidebarName"></div>
-        <div class="user-tag" id="sidebarTag"></div>
-      </div>
-      <button class="panel-btn" title="Sign out" onclick="logout()">⏻</button>
-    </div>
+  <div class="status-bar">
+    <div class="status-dot green" id="statusDot"></div>
+    <span id="statusText">Connected</span>
+    <span style="margin-left:auto" id="onlineCount"></span>
   </div>
 
-  <!-- Main -->
-  <div class="main">
-    <div class="channel-header">
-      <span class="hash">#</span>
-      <span class="name">general</span>
-      <span class="divider"></span>
-      <span class="topic">Welcome to Relay</span>
-      <div class="header-actions">
-        <button class="header-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">☽</button>
-        <span id="onlineCount" style="font-size:0.78rem;color:var(--text-muted);padding:4px 8px;"></span>
-      </div>
+  <div id="chat"></div>
+
+  <div id="typingIndicator"></div>
+
+  <div class="input-area">
+    <div class="input-box">
+      <textarea id="messageInput" placeholder="Message #general" maxlength="2000" rows="1" autocomplete="off" spellcheck="true"></textarea>
+      <button class="send-btn" onclick="sendMessage()">Send</button>
     </div>
-
-    <div class="status-bar">
-      <div class="status-dot green" id="statusDot"></div>
-      <span id="statusText">Connected</span>
-    </div>
-
-    <div id="chat"></div>
-
-    <div id="typingIndicator"></div>
-
-    <div class="input-area">
-      <div class="input-box">
-        <textarea
-          id="messageInput"
-          placeholder="Message #general"
-          maxlength="2000"
-          rows="1"
-          autocomplete="off"
-          spellcheck="true"
-        ></textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send">➤</button>
-      </div>
-      <div class="input-footer">
-        <span>Shift+Enter for new line</span>
-        <span id="charCount"></span>
-      </div>
+    <div class="input-footer">
+      <span>Shift+Enter for new line</span>
+      <span id="charCount"></span>
     </div>
   </div>
 
@@ -526,43 +336,33 @@ const typingIndicator = document.getElementById('typingIndicator');
 const charCountEl     = document.getElementById('charCount');
 const overlay         = document.getElementById('overlay');
 const themeBtn        = document.getElementById('themeBtn');
+const dropdown        = document.getElementById('dropdown');
 
-// --- Sidebar user info --------------------------------------------------------
-const sidebarAvatar = document.getElementById('sidebarAvatar');
-sidebarAvatar.textContent   = (displayName || username).charAt(0).toUpperCase();
-sidebarAvatar.style.background = Relay.colorFor(username);
-document.getElementById('sidebarName').textContent = displayName || username;
-document.getElementById('sidebarTag').textContent  = username;
+// --- Header user info ---------------------------------------------------------
+const chipAvatar = document.getElementById('chipAvatar');
+chipAvatar.textContent     = (displayName || username).charAt(0).toUpperCase();
+chipAvatar.style.background = Relay.colorFor(username);
+document.getElementById('chipName').textContent    = displayName || username;
+document.getElementById('dropDisplay').textContent = displayName || username;
+document.getElementById('dropUser').textContent    = '@' + username;
 
 // --- Theme --------------------------------------------------------------------
-// Discord-style is always dark; light mode swaps to a softer palette
-const themes = {
-  dark: {
-    '--bg': '#313338', '--bg-dark': '#2b2d31', '--bg-darker': '#1e1f22',
-    '--surface': '#383a40', '--border': '#3f4147',
-    '--text': '#dbdee1', '--text-muted': '#949ba4', '--text-dim': '#6d6f78',
-    '--accent': '#5865f2',
-  },
-  light: {
-    '--bg': '#ffffff', '--bg-dark': '#f2f3f5', '--bg-darker': '#e3e5e8',
-    '--surface': '#ebedef', '--border': '#d1d3d7',
-    '--text': '#2e3338', '--text-muted': '#5c5f66', '--text-dim': '#96989d',
-    '--accent': '#5865f2',
-  },
-};
-
-let currentTheme = localStorage.getItem('relay_theme') || 'dark';
+let currentTheme = localStorage.getItem('relay_theme') || 'light';
 applyTheme(currentTheme);
 
 function applyTheme(t) {
-  const vars = themes[t];
-  for (const [k, v] of Object.entries(vars)) document.documentElement.style.setProperty(k, v);
+  document.documentElement.setAttribute('data-theme', t);
   themeBtn.textContent = t === 'dark' ? '☀' : '☽';
   localStorage.setItem('relay_theme', t);
   currentTheme = t;
 }
-
 function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+
+// --- Dropdown -----------------------------------------------------------------
+function toggleDropdown() { dropdown.classList.toggle('open'); }
+document.addEventListener('click', e => {
+  if (!document.getElementById('userChip').contains(e.target)) dropdown.classList.remove('open');
+});
 
 // --- Logout -------------------------------------------------------------------
 function logout() {
@@ -577,9 +377,9 @@ let socket, isConnected = false, reconnectTimer;
 let historyRendered = false;
 const typingUsers = new Map();
 
-// Track last rendered message for grouping
-let lastAuthor = null, lastTime = 0, lastIsHistory = null;
-const GROUP_THRESHOLD = 5 * 60 * 1000; // 5 minutes
+// Message grouping state
+let lastAuthor = null, lastMsgTime = 0, lastIsHistory = null;
+const GROUP_MS = 5 * 60 * 1000; // group messages within 5 minutes
 
 function connect() {
   const wsBase = Relay.api.replace('https://', 'wss://').replace('http://', 'ws://');
@@ -601,7 +401,7 @@ function connect() {
     if (data.type === 'typing')       { handleTyping(data); return; }
     addMessage(data, false);
     if (data.username && data.username !== username && document.hidden && Notification.permission === 'granted') {
-      new Notification(`#general - ${data.displayName || data.username}`, { body: data.message, silent: true });
+      new Notification(`Relay · ${data.displayName || data.username}`, { body: data.message, silent: true });
     }
   };
 
@@ -622,7 +422,7 @@ if (Notification.permission === 'default') Notification.requestPermission();
 
 // --- Render history -----------------------------------------------------------
 function renderHistory(messages) {
-  lastAuthor = null; lastTime = 0;
+  lastAuthor = null; lastMsgTime = 0; lastIsHistory = null;
   for (const msg of messages) addMessage(msg, true);
 
   const sep = document.createElement('div');
@@ -630,7 +430,7 @@ function renderHistory(messages) {
   sep.textContent = 'Earlier messages above · Live below';
   chat.appendChild(sep);
 
-  lastAuthor = null; lastTime = 0; lastIsHistory = null;
+  lastAuthor = null; lastMsgTime = 0; lastIsHistory = null;
   chat.scrollTop = chat.scrollHeight;
   historyRendered = true;
 }
@@ -639,12 +439,13 @@ function renderHistory(messages) {
 function addMessage(data, isHistory) {
   const atBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80;
 
+  // System / join / leave
   if (data.type === 'system' || data.type === 'join' || data.type === 'leave') {
     const div = document.createElement('div');
     div.className = 'system-msg';
     div.textContent = data.message || '';
     chat.appendChild(div);
-    lastAuthor = null; lastTime = 0;
+    lastAuthor = null; lastMsgTime = 0;
     if (atBottom || !isHistory) chat.scrollTop = chat.scrollHeight;
     return;
   }
@@ -653,25 +454,25 @@ function addMessage(data, isHistory) {
   const author  = data.username || 'Anonymous';
   const isContinued = author === lastAuthor
     && lastIsHistory === isHistory
-    && (msgTime - lastTime) < GROUP_THRESHOLD;
+    && (msgTime - lastMsgTime) < GROUP_MS;
 
-  lastAuthor = author; lastTime = msgTime; lastIsHistory = isHistory;
+  lastAuthor = author; lastMsgTime = msgTime; lastIsHistory = isHistory;
 
   const group = document.createElement('div');
   group.className = ['msg-group', isContinued ? 'continued' : '', isHistory ? 'history-msg' : ''].filter(Boolean).join(' ');
 
   // Avatar / mini-time column
   const avatarCol = document.createElement('div');
-  avatarCol.className = 'msg-avatar';
+  avatarCol.className = 'msg-avatar-col';
 
-  if (isContinued) {
-    const miniTime = document.createElement('span');
-    miniTime.className = 'mini-time';
-    miniTime.textContent = formatTime(msgTime);
-    avatarCol.appendChild(miniTime);
-  } else {
+  const miniTime = document.createElement('span');
+  miniTime.className = 'mini-time';
+  miniTime.textContent = formatTime(msgTime);
+  avatarCol.appendChild(miniTime);
+
+  if (!isContinued) {
     const av = document.createElement('div');
-    av.className = 'avatar';
+    av.className = 'msg-avatar';
     av.textContent = (data.displayName || author).charAt(0).toUpperCase();
     av.style.background = Relay.colorFor(author);
     avatarCol.appendChild(av);
@@ -739,13 +540,20 @@ function sendMessage() {
   messageInput.value = '';
   messageInput.style.height = 'auto';
   charCountEl.textContent = '';
+  charCountEl.className = '';
 }
 
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
-  messageInput.style.height = Math.min(messageInput.scrollHeight, 200) + 'px';
+  messageInput.style.height = Math.min(messageInput.scrollHeight, 180) + 'px';
   const len = messageInput.value.length;
-  charCountEl.textContent = len > 1800 ? `${2000 - len} remaining` : '';
+  if (len > 1800) {
+    charCountEl.textContent = `${2000 - len} remaining`;
+    charCountEl.className = 'char-warn';
+  } else {
+    charCountEl.textContent = '';
+    charCountEl.className = '';
+  }
   if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'typing', username }));
 });
 
@@ -761,12 +569,11 @@ function formatTime(ts) {
 function formatDateTime(ts) {
   const d = new Date(ts);
   const today = new Date();
-  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
-  if (d.toDateString() === today.toDateString())
-    return 'Today at ' + formatTime(ts);
-  if (d.toDateString() === yesterday.toDateString())
-    return 'Yesterday at ' + formatTime(ts);
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + formatTime(ts);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  if (d.toDateString() === today.toDateString())     return 'Today at ' + formatTime(ts);
+  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday at ' + formatTime(ts);
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' at ' + formatTime(ts);
 }
 </script>
 </body>
