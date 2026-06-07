@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,17 +28,13 @@
       transition: background 0.2s, color 0.2s;
     }
 
-    .app {
-      height: 100vh; width: 100vw;
-      display: flex; flex-direction: column;
-    }
+    .app { height: 100vh; width: 100vw; display: flex; flex-direction: column; }
 
     /* -- Header -- */
     header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 20px; height: 48px; flex-shrink: 0;
-      background: var(--surface); border-bottom: 1px solid var(--border);
-      gap: 12px;
+      background: var(--surface); border-bottom: 1px solid var(--border); gap: 12px;
     }
 
     .header-left { display: flex; align-items: baseline; gap: 12px; }
@@ -76,14 +72,15 @@
       position: absolute; top: calc(100% + 6px); right: 0;
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 2px; box-shadow: 4px 4px 0 var(--border);
-      min-width: 160px; z-index: 100; display: none;
+      min-width: 170px; z-index: 100; display: none;
     }
     .dropdown.open { display: block; }
     .dropdown-header { padding: 10px 14px; border-bottom: 1px solid var(--border); }
     .dropdown-header .dn { font-size: .82rem; font-weight: 600; }
     .dropdown-header .un { font-size: .65rem; color: var(--muted); margin-top: 1px; font-family: 'DM Mono', monospace; }
     .dropdown-item {
-      display: block; width: 100%; text-align: left; padding: 9px 14px;
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; text-align: left; padding: 9px 14px;
       font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted);
       background: none; border: none; border-top: 1px solid var(--border);
       cursor: pointer; letter-spacing: .06em; transition: background .1s, color .1s;
@@ -116,7 +113,6 @@
       flex: 1; overflow-y: auto; padding: 16px 0 8px;
       display: flex; flex-direction: column; min-height: 0;
     }
-
     #chat::-webkit-scrollbar { width: 5px; }
     #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
@@ -130,40 +126,34 @@
       content: ''; flex: 1; height: 1px; background: var(--accent-dim);
     }
 
-    /* System messages */
     .system-msg {
       padding: 2px 20px 2px 76px;
       font-size: .78rem; color: var(--muted); font-style: italic;
       animation: msgIn .15s ease;
     }
 
-    /* Message group */
     .msg-group {
-      padding: 2px 20px;
-      display: flex; gap: 16px;
+      padding: 2px 20px; display: flex; gap: 16px;
       animation: msgIn .15s ease;
     }
-    .msg-group:hover { background: rgba(0,0,0,0.03); }
+    .msg-group:hover { background: rgba(0,0,0,0.04); }
     [data-theme="dark"] .msg-group:hover { background: rgba(255,255,255,0.03); }
     .msg-group.continued { padding-top: 1px; padding-bottom: 1px; }
-    .msg-group.history-msg { opacity: .55; }
+    .msg-group.history-msg { opacity: .5; }
 
     @keyframes msgIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
 
-    /* Avatar column - fixed 40px wide */
     .msg-avatar-col {
       width: 40px; flex-shrink: 0; padding-top: 2px;
       display: flex; justify-content: center;
     }
-
     .msg-avatar {
       width: 40px; height: 40px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 1rem; font-weight: 600; color: #fff; flex-shrink: 0;
     }
-
-    /* Continued row: show mini timestamp on hover instead of avatar */
     .msg-group.continued .msg-avatar { display: none; }
+
     .mini-time {
       display: none; font-family: 'DM Mono', monospace;
       font-size: .6rem; color: var(--muted); white-space: nowrap;
@@ -172,25 +162,11 @@
     .msg-group.continued .mini-time { display: block; }
     .msg-group.continued:hover .mini-time { opacity: 1; }
 
-    /* Content column */
     .msg-content { flex: 1; min-width: 0; }
-
-    .msg-header {
-      display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px;
-    }
-
-    .msg-author {
-      font-weight: 600; font-size: .94rem; cursor: default;
-    }
-
-    .msg-timestamp {
-      font-family: 'DM Mono', monospace; font-size: .65rem; color: var(--muted);
-    }
-
-    .msg-text {
-      font-size: .92rem; line-height: 1.55;
-      color: var(--ink); word-break: break-word; white-space: pre-wrap;
-    }
+    .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+    .msg-author { font-weight: 600; font-size: .94rem; }
+    .msg-timestamp { font-family: 'DM Mono', monospace; font-size: .65rem; color: var(--muted); }
+    .msg-text { font-size: .92rem; line-height: 1.55; color: var(--ink); word-break: break-word; white-space: pre-wrap; }
 
     /* -- Typing indicator -- */
     #typingIndicator {
@@ -198,7 +174,6 @@
       font-size: .75rem; color: var(--muted);
       display: flex; align-items: center; gap: 6px; flex-shrink: 0;
     }
-
     .typing-dots { display: inline-flex; gap: 3px; }
     .typing-dots span {
       width: 4px; height: 4px; border-radius: 50%; background: var(--muted);
@@ -210,16 +185,13 @@
 
     /* -- Input area -- */
     .input-area { padding: 0 20px 16px; flex-shrink: 0; }
-
     .input-box {
       display: flex; align-items: flex-end; gap: 10px;
       background: var(--cream); border: 1px solid var(--border);
       border-radius: 2px; padding: 0 14px;
       transition: border-color .15s, box-shadow .15s;
     }
-    .input-box:focus-within {
-      border-color: var(--ink); box-shadow: 0 0 0 3px var(--accent-dim);
-    }
+    .input-box:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px var(--accent-dim); }
 
     #messageInput {
       flex: 1; font-family: 'DM Sans', sans-serif; font-size: .92rem;
@@ -243,6 +215,109 @@
       display: flex; justify-content: space-between;
     }
     .char-warn { color: var(--accent); }
+
+    /* -- Settings panel -- */
+    .settings-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 300; display: none; align-items: center; justify-content: center;
+    }
+    .settings-backdrop.open { display: flex; }
+
+    .settings-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 2px; width: min(420px, 92vw);
+      box-shadow: 6px 6px 0 var(--border);
+      animation: fadeUp .2s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+    .settings-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .settings-header h2 {
+      font-family: 'DM Serif Display', serif; font-size: 1.15rem; font-weight: 400;
+    }
+    .settings-close {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 1.1rem; padding: 4px 8px; border-radius: 2px;
+      transition: color .15s, background .15s;
+    }
+    .settings-close:hover { color: var(--ink); background: var(--cream); }
+
+    .settings-body { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+
+    .setting-row { display: flex; flex-direction: column; gap: 8px; }
+    .setting-label {
+      font-family: 'DM Mono', monospace; font-size: .65rem;
+      letter-spacing: .15em; text-transform: uppercase; color: var(--muted);
+    }
+
+    /* Color swatches */
+    .color-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+    .swatch {
+      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+      border: 2px solid transparent; transition: transform .15s, border-color .15s;
+      flex-shrink: 0;
+    }
+    .swatch:hover { transform: scale(1.15); }
+    .swatch.selected { border-color: var(--ink); transform: scale(1.1); }
+
+    .color-custom { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+    .color-custom label {
+      font-family: 'DM Mono', monospace; font-size: .65rem; color: var(--muted);
+    }
+    .color-custom input[type="color"] {
+      width: 36px; height: 28px; border: 1px solid var(--border);
+      border-radius: 2px; cursor: pointer; background: none; padding: 2px;
+    }
+
+    /* Preview */
+    .color-preview {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; background: var(--cream);
+      border: 1px solid var(--border); border-radius: 2px;
+    }
+    .preview-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; color: #fff; font-size: .9rem;
+    }
+    .preview-content { display: flex; flex-direction: column; gap: 2px; }
+    .preview-name { font-weight: 600; font-size: .9rem; }
+    .preview-text { font-size: .82rem; color: var(--muted); }
+
+    /* Theme toggle row */
+    .theme-row { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-pill {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: var(--border); cursor: pointer; position: relative;
+      border: none; transition: background .2s;
+    }
+    .toggle-pill.on { background: var(--accent); }
+    .toggle-pill::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%; background: #fff;
+      transition: transform .2s;
+    }
+    .toggle-pill.on::after { transform: translateX(20px); }
+
+    .settings-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .btn-cancel {
+      font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .08em;
+      padding: 8px 16px; background: none; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 2px; cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-cancel:hover { border-color: var(--ink); color: var(--ink); }
+    .btn-save {
+      font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .08em;
+      padding: 8px 16px; background: var(--ink); color: var(--paper);
+      border: 1px solid var(--ink); border-radius: 2px; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-save:hover { background: var(--accent); border-color: var(--accent); }
+    .btn-save:disabled { opacity: .5; cursor: not-allowed; }
 
     /* -- Connecting overlay -- */
     #overlay {
@@ -268,8 +343,55 @@
   <div style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Connecting…</div>
 </div>
 
-<div class="app">
+<!-- Settings panel -->
+<div class="settings-backdrop" id="settingsBackdrop" onclick="handleBackdropClick(event)">
+  <div class="settings-panel">
+    <div class="settings-header">
+      <h2>Settings</h2>
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-body">
 
+      <!-- Theme -->
+      <div class="setting-row">
+        <div class="setting-label">Appearance</div>
+        <div class="theme-row">
+          <span style="font-size:.88rem">Dark mode</span>
+          <button class="toggle-pill" id="themeToggle" onclick="toggleThemeFromSettings()"></button>
+        </div>
+      </div>
+
+      <!-- Username color -->
+      <div class="setting-row">
+        <div class="setting-label">Username colour</div>
+        <div class="color-swatches" id="colorSwatches"></div>
+        <div class="color-custom">
+          <label for="customColor">Custom</label>
+          <input type="color" id="customColor" oninput="selectCustomColor(this.value)">
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="setting-row">
+        <div class="setting-label">Preview</div>
+        <div class="color-preview">
+          <div class="preview-avatar" id="previewAvatar"></div>
+          <div class="preview-content">
+            <div class="preview-name" id="previewName"></div>
+            <div class="preview-text">This is what your messages look like.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="settings-footer">
+      <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
+      <button class="btn-save" id="saveBtn" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
   <header>
     <div class="header-left">
       <span class="logo">Relay</span>
@@ -285,11 +407,12 @@
             <div class="dn" id="dropDisplay"></div>
             <div class="un" id="dropUser"></div>
           </div>
-          <button class="dropdown-item" onclick="toggleTheme(); event.stopPropagation()">Toggle Theme</button>
-          <button class="dropdown-item danger" onclick="logout()">Sign Out</button>
+          <button class="dropdown-item" onclick="openSettings(); event.stopPropagation()">
+            ⚙ Settings
+          </button>
+          <button class="dropdown-item danger" onclick="logout()">⏻ Sign Out</button>
         </div>
       </div>
-      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">☽</button>
     </div>
   </header>
 
@@ -300,7 +423,6 @@
   </div>
 
   <div id="chat"></div>
-
   <div id="typingIndicator"></div>
 
   <div class="input-area">
@@ -313,7 +435,6 @@
       <span id="charCount"></span>
     </div>
   </div>
-
 </div>
 
 <script src="relay-config.js"></script>
@@ -326,6 +447,21 @@ if (!token || !user) { window.location.href = 'index.html'; }
 const { username, displayName } = user;
 const sessionId = crypto.randomUUID();
 
+// --- Color palette ------------------------------------------------------------
+const PALETTE = [
+  '#c8502a','#e0673d','#2e6da4','#4a8c3f','#7b5ea7',
+  '#b5892a','#3a7d7d','#a43a5c','#4a7ab5','#c4963a',
+  '#5a9e6f','#9b4dca','#d4724a','#3d8fb5','#7a4a9e',
+];
+
+// --- State --------------------------------------------------------------------
+// Color is fetched from the server on load; also cached in localStorage for speed
+let myColor = localStorage.getItem(`relay_color_${username}`) || Relay.colorFor(username);
+let pendingColor = myColor;
+
+// Map of username → color (populated as messages arrive)
+const userColors = {};
+
 // --- DOM ----------------------------------------------------------------------
 const chat            = document.getElementById('chat');
 const messageInput    = document.getElementById('messageInput');
@@ -335,34 +471,143 @@ const onlineCountEl   = document.getElementById('onlineCount');
 const typingIndicator = document.getElementById('typingIndicator');
 const charCountEl     = document.getElementById('charCount');
 const overlay         = document.getElementById('overlay');
-const themeBtn        = document.getElementById('themeBtn');
 const dropdown        = document.getElementById('dropdown');
+const settingsBackdrop = document.getElementById('settingsBackdrop');
+const themeToggle     = document.getElementById('themeToggle');
 
-// --- Header user info ---------------------------------------------------------
-const chipAvatar = document.getElementById('chipAvatar');
-chipAvatar.textContent     = (displayName || username).charAt(0).toUpperCase();
-chipAvatar.style.background = Relay.colorFor(username);
-document.getElementById('chipName').textContent    = displayName || username;
-document.getElementById('dropDisplay').textContent = displayName || username;
-document.getElementById('dropUser').textContent    = '@' + username;
+// --- Header init --------------------------------------------------------------
+function refreshHeader() {
+  const chipAvatar = document.getElementById('chipAvatar');
+  chipAvatar.textContent = (displayName || username).charAt(0).toUpperCase();
+  chipAvatar.style.background = myColor;
+  document.getElementById('chipName').textContent    = displayName || username;
+  document.getElementById('dropDisplay').textContent = displayName || username;
+  document.getElementById('dropUser').textContent    = '@' + username;
+}
+refreshHeader();
+
+// --- Fetch user color from server --------------------------------------------
+async function fetchMyColor() {
+  try {
+    const res  = await fetch(`${Relay.api}/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.color) {
+      myColor = data.color;
+      pendingColor = data.color;
+      localStorage.setItem(`relay_color_${username}`, myColor);
+      refreshHeader();
+    }
+  } catch {}
+}
+fetchMyColor();
 
 // --- Theme --------------------------------------------------------------------
-let currentTheme = localStorage.getItem('relay_theme') || 'light';
+let currentTheme = localStorage.getItem('relay_theme') || 'dark';
 applyTheme(currentTheme);
 
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
-  themeBtn.textContent = t === 'dark' ? '☀' : '☽';
   localStorage.setItem('relay_theme', t);
   currentTheme = t;
+  themeToggle.classList.toggle('on', t === 'dark');
 }
-function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+function toggleThemeFromSettings() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
 
 // --- Dropdown -----------------------------------------------------------------
 function toggleDropdown() { dropdown.classList.toggle('open'); }
 document.addEventListener('click', e => {
   if (!document.getElementById('userChip').contains(e.target)) dropdown.classList.remove('open');
 });
+
+// --- Settings -----------------------------------------------------------------
+function buildSwatches() {
+  const container = document.getElementById('colorSwatches');
+  container.innerHTML = '';
+  PALETTE.forEach(color => {
+    const sw = document.createElement('button');
+    sw.className = 'swatch' + (pendingColor === color ? ' selected' : '');
+    sw.style.background = color;
+    sw.title = color;
+    sw.onclick = () => selectColor(color);
+    container.appendChild(sw);
+  });
+}
+
+function selectColor(color) {
+  pendingColor = color;
+  document.getElementById('customColor').value = color;
+  buildSwatches();
+  updatePreview();
+}
+
+function selectCustomColor(color) {
+  pendingColor = color;
+  // Deselect all swatches
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+  updatePreview();
+}
+
+function updatePreview() {
+  const av = document.getElementById('previewAvatar');
+  av.textContent = (displayName || username).charAt(0).toUpperCase();
+  av.style.background = pendingColor;
+  const name = document.getElementById('previewName');
+  name.textContent = displayName || username;
+  name.style.color = pendingColor;
+}
+
+function openSettings() {
+  dropdown.classList.remove('open');
+  pendingColor = myColor;
+  themeToggle.classList.toggle('on', currentTheme === 'dark');
+  buildSwatches();
+  document.getElementById('customColor').value = myColor;
+  updatePreview();
+  settingsBackdrop.classList.add('open');
+}
+
+function closeSettings() { settingsBackdrop.classList.remove('open'); }
+
+function handleBackdropClick(e) {
+  if (e.target === settingsBackdrop) closeSettings();
+}
+
+async function saveSettings() {
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    const res = await fetch(`${Relay.api}/auth/color`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ color: pendingColor }),
+    });
+    if (!res.ok) throw new Error('Failed');
+
+    myColor = pendingColor;
+    localStorage.setItem(`relay_color_${username}`, myColor);
+    userColors[username] = myColor;
+    refreshHeader();
+
+    // Re-color any already-rendered messages from this user
+    document.querySelectorAll(`.msg-author[data-user="${username}"]`).forEach(el => {
+      el.style.color = myColor;
+    });
+    document.querySelectorAll(`.msg-avatar[data-user="${username}"]`).forEach(el => {
+      el.style.background = myColor;
+    });
+
+    closeSettings();
+  } catch {
+    alert('Could not save - please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save';
+  }
+}
 
 // --- Logout -------------------------------------------------------------------
 function logout() {
@@ -376,10 +621,8 @@ function logout() {
 let socket, isConnected = false, reconnectTimer;
 let historyRendered = false;
 const typingUsers = new Map();
-
-// Message grouping state
 let lastAuthor = null, lastMsgTime = 0, lastIsHistory = null;
-const GROUP_MS = 5 * 60 * 1000; // group messages within 5 minutes
+const GROUP_MS = 5 * 60 * 1000;
 
 function connect() {
   const wsBase = Relay.api.replace('https://', 'wss://').replace('http://', 'ws://');
@@ -420,26 +663,44 @@ setInterval(() => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.
 window.addEventListener('beforeunload', () => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'explicit_leave' })); });
 if (Notification.permission === 'default') Notification.requestPermission();
 
-// --- Render history -----------------------------------------------------------
+// --- Color resolution ---------------------------------------------------------
+// Fetches and caches a user's saved color from the server
+const colorFetchCache = new Set();
+async function resolveColor(uname) {
+  if (userColors[uname]) return userColors[uname];
+  if (uname === username) { userColors[uname] = myColor; return myColor; }
+  if (colorFetchCache.has(uname)) return Relay.colorFor(uname);
+  colorFetchCache.add(uname);
+  try {
+    const res  = await fetch(`${Relay.api}/auth/color/${encodeURIComponent(uname)}`);
+    const data = await res.json();
+    const color = data.color || Relay.colorFor(uname);
+    userColors[uname] = color;
+    // Retroactively update any already-rendered elements for this user
+    document.querySelectorAll(`.msg-author[data-user="${uname}"]`).forEach(el => el.style.color = color);
+    document.querySelectorAll(`.msg-avatar[data-user="${uname}"]`).forEach(el => el.style.background = color);
+    return color;
+  } catch {
+    return Relay.colorFor(uname);
+  }
+}
+
+// --- Render -------------------------------------------------------------------
 function renderHistory(messages) {
   lastAuthor = null; lastMsgTime = 0; lastIsHistory = null;
   for (const msg of messages) addMessage(msg, true);
-
   const sep = document.createElement('div');
   sep.className = 'history-separator';
   sep.textContent = 'Earlier messages above · Live below';
   chat.appendChild(sep);
-
   lastAuthor = null; lastMsgTime = 0; lastIsHistory = null;
   chat.scrollTop = chat.scrollHeight;
   historyRendered = true;
 }
 
-// --- Core render -------------------------------------------------------------
 function addMessage(data, isHistory) {
   const atBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80;
 
-  // System / join / leave
   if (data.type === 'system' || data.type === 'join' || data.type === 'leave') {
     const div = document.createElement('div');
     div.className = 'system-msg';
@@ -458,10 +719,13 @@ function addMessage(data, isHistory) {
 
   lastAuthor = author; lastMsgTime = msgTime; lastIsHistory = isHistory;
 
+  // Use cached color or fallback immediately; async update will patch DOM
+  const cachedColor = userColors[author] || (author === username ? myColor : Relay.colorFor(author));
+
   const group = document.createElement('div');
   group.className = ['msg-group', isContinued ? 'continued' : '', isHistory ? 'history-msg' : ''].filter(Boolean).join(' ');
 
-  // Avatar / mini-time column
+  // Avatar col
   const avatarCol = document.createElement('div');
   avatarCol.className = 'msg-avatar-col';
 
@@ -473,12 +737,13 @@ function addMessage(data, isHistory) {
   if (!isContinued) {
     const av = document.createElement('div');
     av.className = 'msg-avatar';
+    av.dataset.user = author;
     av.textContent = (data.displayName || author).charAt(0).toUpperCase();
-    av.style.background = Relay.colorFor(author);
+    av.style.background = cachedColor;
     avatarCol.appendChild(av);
   }
 
-  // Content column
+  // Content col
   const contentCol = document.createElement('div');
   contentCol.className = 'msg-content';
 
@@ -488,8 +753,9 @@ function addMessage(data, isHistory) {
 
     const authorEl = document.createElement('span');
     authorEl.className = 'msg-author';
+    authorEl.dataset.user = author;
     authorEl.textContent = data.displayName || author;
-    authorEl.style.color = Relay.colorFor(author);
+    authorEl.style.color = cachedColor;
 
     const timeEl = document.createElement('span');
     timeEl.className = 'msg-timestamp';
@@ -510,6 +776,9 @@ function addMessage(data, isHistory) {
   chat.appendChild(group);
 
   if (atBottom || !isHistory) chat.scrollTop = chat.scrollHeight;
+
+  // Async: fetch real color and patch if different
+  resolveColor(author);
 }
 
 // --- Typing -------------------------------------------------------------------
@@ -547,13 +816,8 @@ messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = Math.min(messageInput.scrollHeight, 180) + 'px';
   const len = messageInput.value.length;
-  if (len > 1800) {
-    charCountEl.textContent = `${2000 - len} remaining`;
-    charCountEl.className = 'char-warn';
-  } else {
-    charCountEl.textContent = '';
-    charCountEl.className = '';
-  }
+  if (len > 1800) { charCountEl.textContent = `${2000 - len} remaining`; charCountEl.className = 'char-warn'; }
+  else { charCountEl.textContent = ''; charCountEl.className = ''; }
   if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'typing', username }));
 });
 
@@ -565,12 +829,10 @@ messageInput.addEventListener('keydown', e => {
 function formatTime(ts) {
   return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
-
 function formatDateTime(ts) {
   const d = new Date(ts);
   const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
   if (d.toDateString() === today.toDateString())     return 'Today at ' + formatTime(ts);
   if (d.toDateString() === yesterday.toDateString()) return 'Yesterday at ' + formatTime(ts);
   return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' at ' + formatTime(ts);
