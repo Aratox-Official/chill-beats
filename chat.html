@@ -482,13 +482,11 @@ window.addEventListener('beforeunload', () => { if (socket?.readyState === WebSo
 if (Notification.permission === 'default') Notification.requestPermission();
 
 // --- Delete message -----------------------------------------------------------
-function deleteMessage(msgId, groupEl, textEl) {
+function deleteMessage(msgId, groupEl) {
   if (!confirm('Delete this message?')) return;
-  // Optimistic update
-  textEl.textContent = 'This message was deleted.';
-  textEl.classList.add('deleted');
-  const delBtn = groupEl.querySelector('.msg-delete');
-  if (delBtn) delBtn.remove();
+  // Optimistic removal
+  groupEl.remove();
+  msgElements.delete(msgId);
   // Tell the server / other clients
   if (socket?.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify({ type: 'delete', msgId }));
@@ -498,10 +496,8 @@ function deleteMessage(msgId, groupEl, textEl) {
 function handleRemoteDelete(msgId) {
   const el = msgElements.get(msgId);
   if (!el) return;
-  const textEl = el.querySelector('.msg-text');
-  if (textEl) { textEl.textContent = 'This message was deleted.'; textEl.classList.add('deleted'); }
-  const delBtn = el.querySelector('.msg-delete');
-  if (delBtn) delBtn.remove();
+  el.remove();
+  msgElements.delete(msgId);
 }
 
 // --- Color resolution ---------------------------------------------------------
@@ -549,7 +545,8 @@ function addMessage(data, isHistory) {
 
   const msgTime    = data.time || Date.now();
   const author     = data.username || 'Anonymous';
-  const msgId      = data.msgId || null;
+  // Assign a stable ID to history messages that predate the msgId field
+  const msgId      = data.msgId || `hist-${author}-${msgTime}`;
   const isContinued = author === lastAuthor && lastIsHistory === isHistory && (msgTime - lastMsgTime) < GROUP_MS;
   const isMine     = author === username;
 
@@ -560,12 +557,12 @@ function addMessage(data, isHistory) {
   const group = document.createElement('div');
   group.className = ['msg-group', isContinued ? 'continued' : '', isHistory ? 'history-msg' : ''].filter(Boolean).join(' ');
 
-  // Delete button (only for own non-history messages with a msgId)
-  if (isMine && !isHistory && msgId) {
+  // Delete button - show on own messages (live and history)
+  if (isMine && msgId) {
     const delBtn = document.createElement('button');
     delBtn.className = 'msg-delete';
     delBtn.textContent = '✕ Delete';
-    delBtn.onclick = () => deleteMessage(msgId, group, textEl);
+    delBtn.onclick = () => deleteMessage(msgId, group);
     group.appendChild(delBtn);
   }
 
@@ -613,7 +610,7 @@ function addMessage(data, isHistory) {
   group.appendChild(contentCol);
   chat.appendChild(group);
 
-  if (msgId) msgElements.set(msgId, group);
+  msgElements.set(msgId, group);
   if (atBottom || !isHistory) chat.scrollTop = chat.scrollHeight;
 
   resolveColor(author);
