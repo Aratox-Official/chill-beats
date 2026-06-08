@@ -98,10 +98,10 @@
   </div>
 </div>
 
-<script src="relay-config.js"></script>
+<script src="synapse-config.js"></script>
 <script>
   // If already logged in, skip to chat
-  if (Relay.getToken() && Relay.getUser()) {
+  if (Synapse.getToken() && Synapse.getUser()) {
     window.location.href = 'chat.html';
   }
 
@@ -125,7 +125,7 @@
 
     setLoading(true);
     try {
-      const res  = await fetch(`${Relay.api}/auth/login`, {
+      const res  = await fetch(`${Synapse.api}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -133,7 +133,7 @@
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Login failed.'); setLoading(false); return; }
 
-      Relay.saveSession(data.token, { username: data.username, displayName: data.displayName });
+      Synapse.saveSession(data.token, { username: data.username, displayName: data.displayName });
       window.location.href = 'chat.html';
     } catch {
       setError('Network error - please try again.');
