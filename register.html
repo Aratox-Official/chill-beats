@@ -172,7 +172,7 @@
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Registration failed.'); setLoading(false); return; }
 
-      Synapse.saveSession(data.token, { username: data.username, displayName: data.displayName });
+      Synapse.saveSession(data.token, { username: data.username, displayName: data.displayName, role: data.role || 'member', color: data.color || null, avatarUrl: data.avatarUrl || null });
       setSuccess('Account created! Redirecting…');
       setTimeout(() => { window.location.href = 'chat.html'; }, 800);
     } catch {
