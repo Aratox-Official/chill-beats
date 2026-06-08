@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relay — Sign In</title>
+  <title>Synapse - Sign In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -72,7 +72,7 @@
 </head>
 <body>
 <div class="page">
-  <div class="wordmark">Relay</div>
+  <div class="wordmark">Synapse</div>
   <div class="tagline">Sign in to your account</div>
 
   <div class="card">
@@ -136,7 +136,7 @@
       Relay.saveSession(data.token, { username: data.username, displayName: data.displayName });
       window.location.href = 'chat.html';
     } catch {
-      setError('Network error — please try again.');
+      setError('Network error - please try again.');
       setLoading(false);
     }
   }
