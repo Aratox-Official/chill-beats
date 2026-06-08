@@ -1,19 +1,19 @@
-const RELAY_API = 'https://purple-base-c918.aratox-business.workers.dev';
+const SYNAPSE_API = 'https://purple-base-c918.aratox-business.workers.dev';
 
-const Relay = {
-  api: RELAY_API,
+const Synapse = {
+  api: SYNAPSE_API,
 
-  getToken() { return localStorage.getItem('relay_token'); },
-  getUser()  { return JSON.parse(localStorage.getItem('relay_user') || 'null'); },
+  getToken() { return localStorage.getItem('synapse_token'); },
+  getUser()  { return JSON.parse(localStorage.getItem('synapse_user') || 'null'); },
 
   saveSession(token, user) {
-    localStorage.setItem('relay_token', token);
-    localStorage.setItem('relay_user', JSON.stringify(user));
+    localStorage.setItem('synapse_token', token);
+    localStorage.setItem('synapse_user', JSON.stringify(user));
   },
 
   clearSession() {
-    localStorage.removeItem('relay_token');
-    localStorage.removeItem('relay_user');
+    localStorage.removeItem('synapse_token');
+    localStorage.removeItem('synapse_user');
   },
 
   async requireAuth() {
