@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relay - Chat</title>
+  <title>Synapse - Chat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -180,7 +180,7 @@
 <body>
 
 <div id="overlay">
-  <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--ink)">Relay</div>
+  <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--ink)">Synapse</div>
   <div class="spinner"></div>
   <div style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Connecting…</div>
 </div>
@@ -229,8 +229,7 @@
 <div class="app">
   <header>
     <div class="header-left">
-      <span class="logo">Relay</span>
-      <span class="room-tag"># general</span>
+      <span class="logo">Synapse</span>
     </div>
     <div class="header-right">
       <div class="user-chip" id="userChip" onclick="toggleDropdown()">
@@ -270,11 +269,11 @@
   </div>
 </div>
 
-<script src="relay-config.js"></script>
+<script src="synapse-config.js"></script>
 <script>
 // --- Auth ---------------------------------------------------------------------
-const token = Relay.getToken();
-const user  = Relay.getUser();
+const token = Synapse.getToken();
+const user  = Synapse.getUser();
 if (!token || !user) { window.location.href = 'index.html'; }
 
 const { username, displayName } = user;
@@ -288,7 +287,7 @@ const PALETTE = [
 ];
 
 // --- State --------------------------------------------------------------------
-let myColor     = localStorage.getItem(`relay_color_${username}`) || Relay.colorFor(username);
+let myColor     = localStorage.getItem(`synapse_color_${username}`) || Synapse.colorFor(username);
 let pendingColor = myColor;
 const userColors = {};
 const colorFetchCache = new Set();
@@ -311,13 +310,13 @@ const themeToggle      = document.getElementById('themeToggle');
 
 // --- Theme - read from localStorage, fall back to dark -----------------------
 // Migrate old 'light' default by only using stored value if explicitly set
-const storedTheme = localStorage.getItem('relay_theme');
+const storedTheme = localStorage.getItem('synapse_theme');
 let currentTheme = storedTheme ?? 'dark';
 applyTheme(currentTheme);
 
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('relay_theme', t);
+  localStorage.setItem('synapse_theme', t);
   currentTheme = t;
   themeToggle.classList.toggle('on', t === 'dark');
 }
@@ -337,11 +336,11 @@ refreshHeader();
 // Fetch saved color from server
 (async () => {
   try {
-    const res  = await fetch(`${Relay.api}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+    const res  = await fetch(`${Synapse.api}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } });
     const data = await res.json();
     if (data.color) {
       myColor = data.color; pendingColor = data.color;
-      localStorage.setItem(`relay_color_${username}`, myColor);
+      localStorage.setItem(`synapse_color_${username}`, myColor);
       userColors[username] = myColor;
       refreshHeader();
       document.querySelectorAll(`.msg-author[data-user="${username}"]`).forEach(el => el.style.color = myColor);
@@ -358,9 +357,9 @@ document.addEventListener('click', e => {
 
 // --- Logout -------------------------------------------------------------------
 function logout() {
-  if (!confirm('Sign out of Relay?')) return;
+  if (!confirm('Sign out of Synapse?')) return;
   if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'explicit_leave' }));
-  Relay.clearSession();
+  Synapse.clearSession();
   window.location.href = 'index.html';
 }
 
@@ -417,14 +416,14 @@ async function saveSettings() {
   const btn = document.getElementById('saveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
-    const res = await fetch(`${Relay.api}/auth/color`, {
+    const res = await fetch(`${Synapse.api}/auth/color`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ color: pendingColor }),
     });
     if (!res.ok) throw new Error();
     myColor = pendingColor;
-    localStorage.setItem(`relay_color_${username}`, myColor);
+    localStorage.setItem(`synapse_color_${username}`, myColor);
     userColors[username] = myColor;
     refreshHeader();
     document.querySelectorAll(`.msg-author[data-user="${username}"]`).forEach(el => el.style.color = myColor);
@@ -445,7 +444,7 @@ let lastAuthor = null, lastMsgTime = 0, lastIsHistory = null;
 const GROUP_MS = 5 * 60 * 1000;
 
 function connect() {
-  const wsBase = Relay.api.replace('https://', 'wss://').replace('http://', 'ws://');
+  const wsBase = Synapse.api.replace('https://', 'wss://').replace('http://', 'ws://');
   const url = `${wsBase}/ws?token=${encodeURIComponent(token)}&username=${encodeURIComponent(username)}&sessionId=${sessionId}`;
   socket = new WebSocket(url);
 
@@ -463,7 +462,7 @@ function connect() {
     if (data.type === 'delete')         { handleRemoteDelete(data.msgId); return; }
     addMessage(data, false);
     if (data.username && data.username !== username && document.hidden && Notification.permission === 'granted') {
-      new Notification(`Relay · ${data.displayName || data.username}`, { body: data.message, silent: true });
+      new Notification(`Synapse · ${data.displayName || data.username}`, { body: data.message, silent: true });
     }
   };
 
@@ -504,17 +503,17 @@ function handleRemoteDelete(msgId) {
 async function resolveColor(uname) {
   if (userColors[uname]) return userColors[uname];
   if (uname === username) { userColors[uname] = myColor; return myColor; }
-  if (colorFetchCache.has(uname)) return Relay.colorFor(uname);
+  if (colorFetchCache.has(uname)) return Synapse.colorFor(uname);
   colorFetchCache.add(uname);
   try {
-    const res   = await fetch(`${Relay.api}/auth/color/${encodeURIComponent(uname)}`);
+    const res   = await fetch(`${Synapse.api}/auth/color/${encodeURIComponent(uname)}`);
     const data  = await res.json();
-    const color = data.color || Relay.colorFor(uname);
+    const color = data.color || Synapse.colorFor(uname);
     userColors[uname] = color;
     document.querySelectorAll(`.msg-author[data-user="${uname}"]`).forEach(el => el.style.color = color);
     document.querySelectorAll(`.msg-avatar[data-user="${uname}"]`).forEach(el => el.style.background = color);
     return color;
-  } catch { return Relay.colorFor(uname); }
+  } catch { return Synapse.colorFor(uname); }
 }
 
 // --- Render -------------------------------------------------------------------
@@ -552,7 +551,7 @@ function addMessage(data, isHistory) {
 
   lastAuthor = author; lastMsgTime = msgTime; lastIsHistory = isHistory;
 
-  const cachedColor = userColors[author] || (isMine ? myColor : Relay.colorFor(author));
+  const cachedColor = userColors[author] || (isMine ? myColor : Synapse.colorFor(author));
 
   const group = document.createElement('div');
   group.className = ['msg-group', isContinued ? 'continued' : '', isHistory ? 'history-msg' : ''].filter(Boolean).join(' ');
