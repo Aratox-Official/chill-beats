@@ -116,7 +116,7 @@
   <div class="footer-link">Already have an account? <a href="index.html">Sign in</a></div>
 </div>
 
-<script src="relay-config.js"></script>
+<script src="synapse-config.js"></script>
 <script>
   const usernameEl    = document.getElementById('username');
   const displayNameEl = document.getElementById('displayName');
@@ -164,7 +164,7 @@
 
     setLoading(true);
     try {
-      const res  = await fetch(`${Relay.api}/auth/register`, {
+      const res  = await fetch(`${Synapse.api}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password, displayName: displayName || username }),
@@ -172,7 +172,7 @@
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Registration failed.'); setLoading(false); return; }
 
-      Relay.saveSession(data.token, { username: data.username, displayName: data.displayName });
+      Synapse.saveSession(data.token, { username: data.username, displayName: data.displayName });
       setSuccess('Account created! Redirecting…');
       setTimeout(() => { window.location.href = 'chat.html'; }, 800);
     } catch {
