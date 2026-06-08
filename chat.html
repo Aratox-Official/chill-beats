@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Synapse - Chat</title>
+  <title>Synapse — Chat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -22,10 +22,10 @@
 
     html, body { height: 100%; width: 100%; overflow: hidden; font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); transition: background 0.2s, color 0.2s; }
 
-    /* -- App shell - sidebar on right -- */
+    /* ── App shell — sidebar on right ── */
     .app { height: 100vh; width: 100vw; display: grid; grid-template-columns: 1fr 220px; grid-template-rows: auto auto 1fr auto auto; grid-template-areas: "header  sidebar" "status  sidebar" "chat    sidebar" "typing  sidebar" "input   sidebar"; }
 
-    /* -- Header -- */
+    /* ── Header ── */
     header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; }
     .header-left { display: flex; align-items: baseline; gap: 10px; }
     .logo { font-family: 'DM Serif Display', serif; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--ink); }
@@ -49,17 +49,16 @@
     .dd-item:hover { background: var(--cream); color: var(--ink); }
     .dd-item.danger:hover { color: var(--danger); }
 
-    /* Clear chat button - only shown for staff */
-    #clearChatBtn { display: none; }
+    /* Clear chat button — visibility controlled by JS in refreshHeader() */
 
-    /* -- Status -- */
+    /* ── Status ── */
     .status-bar { grid-area: status; padding: 3px 16px; font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: var(--cream); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
     .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
     .status-dot.green { background: #4caf50; animation: blink 2.5s ease-in-out infinite; }
     .status-dot.red   { background: #e74c3c; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    /* -- Online sidebar -- */
+    /* ── Online sidebar ── */
     .online-sidebar { grid-area: sidebar; background: var(--cream); border-left: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
     .online-sidebar::-webkit-scrollbar { width: 4px; }
     .online-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -76,7 +75,7 @@
     .ou-name { font-size: .8rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ou-badge { font-family: 'DM Mono', monospace; font-size: .55rem; letter-spacing: .08em; font-weight: 700; padding: 1px 5px; border-radius: 2px; display: inline-block; margin-top: 1px; }
 
-    /* -- Messages -- */
+    /* ── Messages ── */
     #chat { grid-area: chat; overflow-y: auto; padding: 12px 0 4px; display: flex; flex-direction: column; min-height: 0; }
     #chat::-webkit-scrollbar { width: 5px; }
     #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -116,7 +115,7 @@
     .msg-timestamp { font-family: 'DM Mono', monospace; font-size: .62rem; color: var(--muted); }
     .msg-text { font-size: .9rem; line-height: 1.55; color: var(--ink); word-break: break-word; white-space: pre-wrap; }
 
-    /* -- Typing -- */
+    /* ── Typing ── */
     #typingIndicator { grid-area: typing; height: 20px; padding: 0 16px 0 72px; font-size: .73rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
     .typing-dots { display: inline-flex; gap: 3px; }
     .typing-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); animation: dotBounce 1.3s ease-in-out infinite; }
@@ -124,7 +123,7 @@
     .typing-dots span:nth-child(3) { animation-delay: .32s; }
     @keyframes dotBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
 
-    /* -- Input -- */
+    /* ── Input ── */
     .input-area { grid-area: input; padding: 0 16px 14px; }
     .input-box { display: flex; align-items: flex-end; gap: 8px; background: var(--cream); border: 1px solid var(--border); border-radius: 2px; padding: 0 12px; transition: border-color .15s, box-shadow .15s; }
     .input-box:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px var(--accent-dim); }
@@ -135,7 +134,7 @@
     .input-footer { padding: 3px 2px 0; font-family: 'DM Mono', monospace; font-size: .58rem; color: var(--muted); display: flex; justify-content: space-between; }
     .char-warn { color: var(--accent); }
 
-    /* -- Settings panel -- */
+    /* ── Settings panel ── */
     .settings-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 300; display: none; align-items: center; justify-content: center; }
     .settings-backdrop.open { display: flex; }
     .settings-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; width: min(460px, 94vw); max-height: 90vh; overflow-y: auto; box-shadow: 6px 6px 0 var(--border); animation: fadeUp .2s ease; }
@@ -196,13 +195,13 @@
     .feedback.ok  { color: #4caf50; }
     .feedback.err { color: var(--danger); }
 
-    /* -- Overlay -- */
+    /* ── Overlay ── */
     #overlay { position: fixed; inset: 0; background: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 200; transition: opacity .3s; }
     #overlay.hidden { opacity: 0; pointer-events: none; }
     .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--ink); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* -- Responsive -- */
+    /* ── Responsive ── */
     @media (max-width: 600px) {
       .app { grid-template-columns: 1fr; grid-template-areas: "header" "status" "chat" "typing" "input"; }
       .online-sidebar { display: none; }
@@ -270,7 +269,7 @@
         </div>
       </div>
 
-      <!-- Role assignment - developer only -->
+      <!-- Role assignment — developer only -->
       <div class="setting-row" id="roleSection" style="display:none">
         <div class="setting-label">Assign Role</div>
         <div class="role-assign-row">
@@ -299,6 +298,7 @@
   <header>
     <div class="header-left">
       <span class="logo">Synapse</span>
+      <span class="room-tag"># general</span>
     </div>
     <div class="header-right">
       <div class="user-chip" id="userChip" onclick="toggleDropdown()">
@@ -329,7 +329,7 @@
 
   <div class="input-area">
     <div class="input-box">
-      <textarea id="messageInput" placeholder="Type here..." maxlength="2000" rows="1" autocomplete="off" spellcheck="true"></textarea>
+      <textarea id="messageInput" placeholder="Message #general" maxlength="2000" rows="1" autocomplete="off" spellcheck="true"></textarea>
       <button class="send-btn" onclick="sendMessage()">Send</button>
     </div>
     <div class="input-footer">
@@ -339,14 +339,14 @@
   </div>
 
   <div class="online-sidebar">
-    <div class="sidebar-header">Online - <span id="onlineCount">0</span></div>
+    <div class="sidebar-header">Online — <span id="onlineCount">0</span></div>
     <div class="online-list" id="onlineList"></div>
   </div>
 </div>
 
 <script src="synapse-config.js"></script>
 <script>
-// --- Auth ---------------------------------------------------------------------
+// ─── Auth ─────────────────────────────────────────────────────────────────────
 const token = Synapse.getToken();
 const user  = Synapse.getUser();
 if (!token || !user) { window.location.href = 'index.html'; }
@@ -354,7 +354,7 @@ if (!token || !user) { window.location.href = 'index.html'; }
 let { username, displayName, role, avatarUrl, color: savedColor } = user;
 const sessionId = crypto.randomUUID();
 
-// --- Constants ----------------------------------------------------------------
+// ─── Constants ────────────────────────────────────────────────────────────────
 const PALETTE = ['#c8502a','#e0673d','#2e6da4','#4a8c3f','#7b5ea7','#b5892a','#3a7d7d','#a43a5c','#4a7ab5','#c4963a','#5a9e6f','#9b4dca','#d4724a','#3d8fb5','#7a4a9e'];
 const ROLE_META = {
   developer: { label: 'DEV',   color: '#e0673d' },
@@ -365,7 +365,7 @@ const ROLE_META = {
 };
 const CAN_CLEAR = ['developer', 'admin', 'moderator'];
 
-// --- State --------------------------------------------------------------------
+// ─── State ────────────────────────────────────────────────────────────────────
 let myColor      = savedColor || localStorage.getItem(`synapse_color_${username}`) || Synapse.colorFor(username);
 let myAvatarUrl  = avatarUrl  || localStorage.getItem(`synapse_avatar_${username}`) || '';
 let pendingColor = myColor;
@@ -375,7 +375,7 @@ const userProfiles = {}; // username → { color, avatarUrl, role }
 const profileFetchCache = new Set();
 const msgElements = new Map(); // msgId → DOM element
 
-// --- DOM ----------------------------------------------------------------------
+// ─── DOM ──────────────────────────────────────────────────────────────────────
 const chat             = document.getElementById('chat');
 const messageInput     = document.getElementById('messageInput');
 const statusDot        = document.getElementById('statusDot');
@@ -389,7 +389,7 @@ const themeToggle      = document.getElementById('themeToggle');
 const onlineList       = document.getElementById('onlineList');
 const onlineCount      = document.getElementById('onlineCount');
 
-// --- Theme --------------------------------------------------------------------
+// ─── Theme ────────────────────────────────────────────────────────────────────
 let currentTheme = localStorage.getItem('synapse_theme') ?? 'dark';
 applyTheme(currentTheme);
 function applyTheme(t) {
@@ -400,7 +400,7 @@ function applyTheme(t) {
 }
 function toggleThemeFromSettings() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
 
-// --- Avatar helpers -----------------------------------------------------------
+// ─── Avatar helpers ───────────────────────────────────────────────────────────
 function makeAvatarEl(avatarUrl, name, color, className, size = 40) {
   if (avatarUrl) {
     const img = document.createElement('img');
@@ -416,7 +416,7 @@ function makeAvatarEl(avatarUrl, name, color, className, size = 40) {
   return ph;
 }
 
-// --- Header -------------------------------------------------------------------
+// ─── Header ───────────────────────────────────────────────────────────────────
 function refreshHeader() {
   const wrap = document.getElementById('chipAvatarWrap');
   wrap.innerHTML = '';
@@ -457,13 +457,13 @@ refreshHeader();
   } catch {}
 })();
 
-// --- Dropdown -----------------------------------------------------------------
+// ─── Dropdown ─────────────────────────────────────────────────────────────────
 function toggleDropdown() { dropdown.classList.toggle('open'); }
 document.addEventListener('click', e => {
   if (!document.getElementById('userChip').contains(e.target)) dropdown.classList.remove('open');
 });
 
-// --- Clear chat ---------------------------------------------------------------
+// ─── Clear chat ───────────────────────────────────────────────────────────────
 async function clearChat() {
   dropdown.classList.remove('open');
   if (!confirm('Clear the entire chat history? This cannot be undone.')) return;
@@ -475,7 +475,7 @@ async function clearChat() {
   } catch { alert('Network error.'); }
 }
 
-// --- Logout -------------------------------------------------------------------
+// ─── Logout ───────────────────────────────────────────────────────────────────
 function logout() {
   if (!confirm('Sign out of Synapse?')) return;
   if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'explicit_leave' }));
@@ -483,7 +483,7 @@ function logout() {
   window.location.href = 'index.html';
 }
 
-// --- Settings -----------------------------------------------------------------
+// ─── Settings ─────────────────────────────────────────────────────────────────
 function buildSwatches() {
   const c = document.getElementById('colorSwatches'); c.innerHTML = '';
   PALETTE.forEach(color => {
@@ -582,7 +582,7 @@ async function saveSettings() {
     refreshHeader();
     patchUserElements(username, myColor, myAvatarUrl);
     closeSettings();
-  } catch { fb.textContent = 'Network error - please try again.'; fb.className = 'feedback err'; }
+  } catch { fb.textContent = 'Network error — please try again.'; fb.className = 'feedback err'; }
   finally { btn.disabled = false; btn.textContent = 'Save'; }
 }
 
@@ -606,7 +606,7 @@ async function assignRole() {
   } catch { fb.textContent = 'Network error.'; fb.className = 'feedback err'; }
 }
 
-// --- Profile fetch & DOM patching ---------------------------------------------
+// ─── Profile fetch & DOM patching ─────────────────────────────────────────────
 async function resolveProfile(uname) {
   if (userProfiles[uname]) return userProfiles[uname];
   if (uname === username) {
@@ -633,7 +633,7 @@ function patchUserElements(uname, color, avatarUrl) {
   });
 }
 
-// --- WebSocket ----------------------------------------------------------------
+// ─── WebSocket ────────────────────────────────────────────────────────────────
 let socket, isConnected = false, reconnectTimer;
 let historyRendered = false;
 const typingUsers = new Map();
@@ -668,7 +668,7 @@ function connect() {
 
   socket.onclose = () => {
     isConnected = false; statusDot.className = 'status-dot red';
-    statusText.textContent = 'Disconnected - reconnecting…';
+    statusText.textContent = 'Disconnected — reconnecting…';
     reconnectTimer = setTimeout(connect, 2500);
   };
 
@@ -680,7 +680,7 @@ setInterval(() => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.
 window.addEventListener('beforeunload', () => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'explicit_leave' })); });
 if (Notification.permission === 'default') Notification.requestPermission();
 
-// --- Online list --------------------------------------------------------------
+// ─── Online list ──────────────────────────────────────────────────────────────
 function renderOnlineList(users) {
   onlineCount.textContent = users.length;
   onlineList.innerHTML = '';
@@ -730,7 +730,7 @@ function renderOnlineList(users) {
   }
 }
 
-// --- Chat cleared -------------------------------------------------------------
+// ─── Chat cleared ─────────────────────────────────────────────────────────────
 function handleChatCleared(clearedBy) {
   chat.innerHTML = '';
   msgElements.clear();
@@ -741,7 +741,7 @@ function handleChatCleared(clearedBy) {
   chat.appendChild(div);
 }
 
-// --- Role update --------------------------------------------------------------
+// ─── Role update ──────────────────────────────────────────────────────────────
 function handleRoleUpdate(data) {
   if (userProfiles[data.username]) userProfiles[data.username].role = data.role;
   if (data.username === username) {
@@ -756,14 +756,14 @@ function handleRoleUpdate(data) {
   });
 }
 
-// --- Avatar update ------------------------------------------------------------
+// ─── Avatar update ────────────────────────────────────────────────────────────
 function handleAvatarUpdate(data) {
   if (userProfiles[data.username]) userProfiles[data.username].avatarUrl = data.avatarUrl;
   if (data.username === username) { myAvatarUrl = data.avatarUrl; refreshHeader(); }
   patchUserElements(data.username, userProfiles[data.username]?.color || Synapse.colorFor(data.username), data.avatarUrl);
 }
 
-// --- Delete -------------------------------------------------------------------
+// ─── Delete ───────────────────────────────────────────────────────────────────
 function deleteMessage(msgId, groupEl) {
   if (!confirm('Delete this message?')) return;
   groupEl.remove(); msgElements.delete(msgId);
@@ -775,7 +775,7 @@ function handleRemoteDelete(msgId) {
   if (el) { el.remove(); msgElements.delete(msgId); }
 }
 
-// --- Render history -----------------------------------------------------------
+// ─── Render history ───────────────────────────────────────────────────────────
 function renderHistory(messages) {
   lastAuthor = null; lastMsgTime = 0; lastIsHistory = null;
   for (const msg of messages) addMessage(msg, true);
@@ -787,7 +787,7 @@ function renderHistory(messages) {
   historyRendered = true;
 }
 
-// --- Add message -------------------------------------------------------------
+// ─── Add message ─────────────────────────────────────────────────────────────
 function addMessage(data, isHistory) {
   const atBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80;
 
@@ -868,7 +868,7 @@ function addMessage(data, isHistory) {
   resolveProfile(author);
 }
 
-// --- Typing -------------------------------------------------------------------
+// ─── Typing ───────────────────────────────────────────────────────────────────
 function handleTyping(data) {
   if (data.username === username) return;
   if (typingUsers.has(data.username)) clearTimeout(typingUsers.get(data.username));
@@ -882,7 +882,7 @@ function updateTypingDisplay() {
   typingIndicator.innerHTML = `<span class="typing-dots"><span></span><span></span><span></span></span><span><strong>${names}</strong> ${users.length === 1 ? 'is' : 'are'} typing…</span>`;
 }
 
-// --- Send ---------------------------------------------------------------------
+// ─── Send ─────────────────────────────────────────────────────────────────────
 function sendMessage() {
   const text = messageInput.value.trim();
   if (!text || !isConnected) return;
@@ -900,7 +900,7 @@ messageInput.addEventListener('input', () => {
 });
 messageInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
-// --- Helpers ------------------------------------------------------------------
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatTime(ts) { return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
 function formatDateTime(ts) {
   const d = new Date(ts), today = new Date(), yesterday = new Date(today);
