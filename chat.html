@@ -12,169 +12,201 @@
     :root {
       --ink: #0d0d0d; --paper: #f5f0e8; --cream: #ede7d9;
       --accent: #c8502a; --accent-dim: #e8d5cc; --muted: #7a7060;
-      --border: #c5bba8; --surface: #fff;
+      --border: #c5bba8; --surface: #fff; --danger: #c0392b;
     }
-
     [data-theme="dark"] {
       --ink: #f0ebe0; --paper: #141210; --cream: #1e1b17;
       --accent: #e0673d; --accent-dim: #3a2218; --muted: #8a8070;
-      --border: #3a342a; --surface: #1e1b17;
+      --border: #3a342a; --surface: #1e1b17; --danger: #e74c3c;
     }
 
-    html, body {
-      height: 100%; width: 100%; overflow: hidden;
-      font-family: 'DM Sans', sans-serif;
-      background: var(--paper); color: var(--ink);
-      transition: background 0.2s, color 0.2s;
-    }
+    html, body { height: 100%; width: 100%; overflow: hidden; font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); transition: background 0.2s, color 0.2s; }
 
-    .app { height: 100vh; width: 100vw; display: flex; flex-direction: column; }
+    /* -- App shell - sidebar on right -- */
+    .app { height: 100vh; width: 100vw; display: grid; grid-template-columns: 1fr 220px; grid-template-rows: auto auto 1fr auto auto; grid-template-areas: "header  sidebar" "status  sidebar" "chat    sidebar" "typing  sidebar" "input   sidebar"; }
 
     /* -- Header -- */
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 20px; height: 48px; flex-shrink: 0;
-      background: var(--surface); border-bottom: 1px solid var(--border); gap: 12px;
-    }
-    .header-left { display: flex; align-items: baseline; gap: 12px; }
-    .logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
-    .room-tag { font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 2px 8px; border-radius: 2px; }
-    .header-right { display: flex; align-items: center; gap: 8px; }
+    header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; }
+    .header-left { display: flex; align-items: baseline; gap: 10px; }
+    .logo { font-family: 'DM Serif Display', serif; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--ink); }
+    .room-tag { font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 2px 7px; border-radius: 2px; }
+    .header-right { display: flex; align-items: center; gap: 7px; }
 
-    .user-chip {
-      display: flex; align-items: center; gap: 7px;
-      font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted);
-      padding: 4px 10px; border: 1px solid var(--border); border-radius: 2px;
-      background: var(--cream); position: relative; cursor: pointer; transition: border-color .15s;
-    }
+    /* User chip */
+    .user-chip { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--muted); padding: 3px 9px; border: 1px solid var(--border); border-radius: 2px; background: var(--cream); position: relative; cursor: pointer; transition: border-color .15s; }
     .user-chip:hover { border-color: var(--ink); }
-    .chip-avatar { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .58rem; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .chip-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .chip-avatar-placeholder { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .6rem; font-weight: 600; color: #fff; flex-shrink: 0; }
 
-    .dropdown { position: absolute; top: calc(100% + 6px); right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; box-shadow: 4px 4px 0 var(--border); min-width: 170px; z-index: 100; display: none; }
+    /* Dropdown */
+    .dropdown { position: absolute; top: calc(100% + 6px); right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; box-shadow: 4px 4px 0 var(--border); min-width: 175px; z-index: 100; display: none; }
     .dropdown.open { display: block; }
-    .dropdown-header { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-    .dropdown-header .dn { font-size: .82rem; font-weight: 600; }
-    .dropdown-header .un { font-size: .65rem; color: var(--muted); margin-top: 1px; font-family: 'DM Mono', monospace; }
-    .dropdown-item { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 9px 14px; font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted); background: none; border: none; border-top: 1px solid var(--border); cursor: pointer; letter-spacing: .06em; transition: background .1s, color .1s; }
-    .dropdown-item:hover { background: var(--cream); color: var(--ink); }
-    .dropdown-item.danger:hover { color: var(--accent); }
+    .dd-header { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    .dd-dn { font-size: .82rem; font-weight: 600; }
+    .dd-un { font-size: .62rem; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 1px; }
+    .dd-role { display: inline-block; font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .1em; padding: 1px 6px; border-radius: 2px; margin-top: 4px; font-weight: 600; }
+    .dd-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 14px; font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--muted); background: none; border: none; border-top: 1px solid var(--border); cursor: pointer; letter-spacing: .05em; transition: background .1s, color .1s; text-align: left; }
+    .dd-item:hover { background: var(--cream); color: var(--ink); }
+    .dd-item.danger:hover { color: var(--danger); }
 
-    /* -- Status bar -- */
-    .status-bar { padding: 3px 20px; font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: var(--cream); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    /* Clear chat button - only shown for staff */
+    #clearChatBtn { display: none; }
+
+    /* -- Status -- */
+    .status-bar { grid-area: status; padding: 3px 16px; font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: var(--cream); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
     .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
     .status-dot.green { background: #4caf50; animation: blink 2.5s ease-in-out infinite; }
     .status-dot.red   { background: #e74c3c; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
+    /* -- Online sidebar -- */
+    .online-sidebar { grid-area: sidebar; background: var(--cream); border-left: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
+    .online-sidebar::-webkit-scrollbar { width: 4px; }
+    .online-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .sidebar-header { padding: 14px 12px 6px; font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .online-list { padding: 8px 4px; display: flex; flex-direction: column; gap: 2px; }
+
+    .online-user { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 2px; transition: background .1s; }
+    .online-user:hover { background: var(--border); }
+    .online-user .ou-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; position: relative; }
+    .online-user .ou-avatar-ph { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .ou-avatar-wrap { position: relative; flex-shrink: 0; }
+    .ou-online-dot { position: absolute; bottom: 0; right: 0; width: 9px; height: 9px; border-radius: 50%; background: #4caf50; border: 2px solid var(--cream); }
+    .ou-info { flex: 1; min-width: 0; }
+    .ou-name { font-size: .8rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ou-badge { font-family: 'DM Mono', monospace; font-size: .55rem; letter-spacing: .08em; font-weight: 700; padding: 1px 5px; border-radius: 2px; display: inline-block; margin-top: 1px; }
+
     /* -- Messages -- */
-    #chat { flex: 1; overflow-y: auto; padding: 16px 0 8px; display: flex; flex-direction: column; min-height: 0; }
+    #chat { grid-area: chat; overflow-y: auto; padding: 12px 0 4px; display: flex; flex-direction: column; min-height: 0; }
     #chat::-webkit-scrollbar { width: 5px; }
     #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    .history-separator { display: flex; align-items: center; gap: 10px; margin: 8px 20px 16px; font-family: 'DM Mono', monospace; font-size: .6rem; color: var(--accent); font-style: italic; }
+    .history-separator { display: flex; align-items: center; gap: 10px; margin: 8px 16px 14px; font-family: 'DM Mono', monospace; font-size: .58rem; color: var(--accent); font-style: italic; }
     .history-separator::before, .history-separator::after { content: ''; flex: 1; height: 1px; background: var(--accent-dim); }
 
-    .system-msg { padding: 2px 20px 2px 76px; font-size: .78rem; color: var(--muted); font-style: italic; animation: msgIn .15s ease; }
+    .system-msg { padding: 2px 16px 2px 72px; font-size: .76rem; color: var(--muted); font-style: italic; animation: msgIn .15s ease; }
 
-    /* Message group */
-    .msg-group { padding: 2px 20px; display: flex; gap: 16px; animation: msgIn .15s ease; position: relative; }
+    .msg-group { padding: 2px 16px; display: flex; gap: 12px; animation: msgIn .15s ease; position: relative; }
     .msg-group:hover { background: rgba(0,0,0,0.04); }
     [data-theme="dark"] .msg-group:hover { background: rgba(255,255,255,0.03); }
     .msg-group.continued { padding-top: 1px; padding-bottom: 1px; }
     .msg-group.history-msg { opacity: .5; }
-
     @keyframes msgIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
 
-    /* Delete button - appears on hover */
-    .msg-delete {
-      position: absolute; top: 4px; right: 16px;
-      background: var(--cream); border: 1px solid var(--border);
-      border-radius: 2px; color: var(--muted); cursor: pointer;
-      font-size: .65rem; font-family: 'DM Mono', monospace;
-      padding: 2px 8px; letter-spacing: .05em;
-      opacity: 0; transition: opacity .1s, color .1s, border-color .1s;
-      display: flex; align-items: center; gap: 4px;
-    }
+    /* Delete button */
+    .msg-delete { position: absolute; top: 4px; right: 12px; background: var(--cream); border: 1px solid var(--border); border-radius: 2px; color: var(--muted); cursor: pointer; font-size: .62rem; font-family: 'DM Mono', monospace; padding: 2px 7px; opacity: 0; transition: opacity .1s, color .1s, border-color .1s; }
     .msg-group:hover .msg-delete { opacity: 1; }
-    .msg-delete:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+    .msg-delete:hover { color: var(--danger); border-color: var(--danger); }
 
+    /* Avatar column */
     .msg-avatar-col { width: 40px; flex-shrink: 0; padding-top: 2px; display: flex; justify-content: center; }
-    .msg-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 600; color: #fff; flex-shrink: 0; }
-    .msg-group.continued .msg-avatar { display: none; }
-
-    .mini-time { display: none; font-family: 'DM Mono', monospace; font-size: .6rem; color: var(--muted); white-space: nowrap; opacity: 0; transition: opacity .1s; padding-top: 3px; }
+    .msg-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .msg-avatar-ph { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 600; color: #fff; flex-shrink: 0; }
+    .msg-group.continued .msg-avatar,
+    .msg-group.continued .msg-avatar-ph { display: none; }
+    .mini-time { display: none; font-family: 'DM Mono', monospace; font-size: .58rem; color: var(--muted); white-space: nowrap; opacity: 0; transition: opacity .1s; padding-top: 4px; }
     .msg-group.continued .mini-time { display: block; }
     .msg-group.continued:hover .mini-time { opacity: 1; }
 
+    /* Content */
     .msg-content { flex: 1; min-width: 0; }
-    .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
-    .msg-author { font-weight: 600; font-size: .94rem; }
-    .msg-timestamp { font-family: 'DM Mono', monospace; font-size: .65rem; color: var(--muted); }
-    .msg-text { font-size: .92rem; line-height: 1.55; color: var(--ink); word-break: break-word; white-space: pre-wrap; }
+    .msg-header { display: flex; align-items: baseline; gap: 6px; margin-bottom: 2px; flex-wrap: wrap; }
+    .msg-author { font-weight: 600; font-size: .92rem; }
+    .msg-badge { font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .08em; font-weight: 700; padding: 1px 5px; border-radius: 2px; vertical-align: middle; }
+    .msg-timestamp { font-family: 'DM Mono', monospace; font-size: .62rem; color: var(--muted); }
+    .msg-text { font-size: .9rem; line-height: 1.55; color: var(--ink); word-break: break-word; white-space: pre-wrap; }
 
-    /* Deleted message style */
-    .msg-text.deleted { color: var(--muted); font-style: italic; }
-
-    /* -- Typing indicator -- */
-    #typingIndicator { height: 22px; padding: 0 20px 0 76px; font-size: .75rem; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    /* -- Typing -- */
+    #typingIndicator { grid-area: typing; height: 20px; padding: 0 16px 0 72px; font-size: .73rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
     .typing-dots { display: inline-flex; gap: 3px; }
     .typing-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); animation: dotBounce 1.3s ease-in-out infinite; }
     .typing-dots span:nth-child(2) { animation-delay: .16s; }
     .typing-dots span:nth-child(3) { animation-delay: .32s; }
     @keyframes dotBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
 
-    /* -- Input area -- */
-    .input-area { padding: 0 20px 16px; flex-shrink: 0; }
-    .input-box { display: flex; align-items: flex-end; gap: 10px; background: var(--cream); border: 1px solid var(--border); border-radius: 2px; padding: 0 14px; transition: border-color .15s, box-shadow .15s; }
+    /* -- Input -- */
+    .input-area { grid-area: input; padding: 0 16px 14px; }
+    .input-box { display: flex; align-items: flex-end; gap: 8px; background: var(--cream); border: 1px solid var(--border); border-radius: 2px; padding: 0 12px; transition: border-color .15s, box-shadow .15s; }
     .input-box:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px var(--accent-dim); }
-    #messageInput { flex: 1; font-family: 'DM Sans', sans-serif; font-size: .92rem; padding: 11px 0; background: none; border: none; color: var(--ink); outline: none; resize: none; min-height: 44px; max-height: 180px; line-height: 1.5; }
+    #messageInput { flex: 1; font-family: 'DM Sans', sans-serif; font-size: .9rem; padding: 10px 0; background: none; border: none; color: var(--ink); outline: none; resize: none; min-height: 42px; max-height: 160px; line-height: 1.5; }
     #messageInput::placeholder { color: var(--border); }
-    .send-btn { font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .08em; padding: 7px 14px; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; cursor: pointer; transition: background .15s; flex-shrink: 0; margin-bottom: 8px; }
+    .send-btn { font-family: 'DM Mono', monospace; font-size: .7rem; letter-spacing: .08em; padding: 7px 13px; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; cursor: pointer; transition: background .15s; flex-shrink: 0; margin-bottom: 7px; }
     .send-btn:hover { background: var(--accent); }
-    .send-btn:active { transform: scale(.97); }
-    .input-footer { padding: 4px 2px 0; font-family: 'DM Mono', monospace; font-size: .6rem; color: var(--muted); display: flex; justify-content: space-between; }
+    .input-footer { padding: 3px 2px 0; font-family: 'DM Mono', monospace; font-size: .58rem; color: var(--muted); display: flex; justify-content: space-between; }
     .char-warn { color: var(--accent); }
 
     /* -- Settings panel -- */
     .settings-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 300; display: none; align-items: center; justify-content: center; }
     .settings-backdrop.open { display: flex; }
-    .settings-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; width: min(420px, 92vw); box-shadow: 6px 6px 0 var(--border); animation: fadeUp .2s ease; }
+    .settings-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; width: min(460px, 94vw); max-height: 90vh; overflow-y: auto; box-shadow: 6px 6px 0 var(--border); animation: fadeUp .2s ease; }
     @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    .settings-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .settings-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.15rem; font-weight: 400; }
-    .settings-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 4px 8px; border-radius: 2px; transition: color .15s, background .15s; }
+    .settings-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--surface); z-index: 1; }
+    .settings-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; font-weight: 400; }
+    .settings-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 4px 8px; border-radius: 2px; transition: color .15s, background .15s; }
     .settings-close:hover { color: var(--ink); background: var(--cream); }
-    .settings-body { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+    .settings-body { padding: 20px; display: flex; flex-direction: column; gap: 22px; }
     .setting-row { display: flex; flex-direction: column; gap: 8px; }
-    .setting-label { font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+    .setting-label { font-family: 'DM Mono', monospace; font-size: .63rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
     .theme-row { display: flex; align-items: center; justify-content: space-between; }
     .toggle-pill { width: 44px; height: 24px; border-radius: 12px; background: var(--border); cursor: pointer; position: relative; border: none; transition: background .2s; flex-shrink: 0; }
     .toggle-pill.on { background: var(--accent); }
     .toggle-pill::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s; }
     .toggle-pill.on::after { transform: translateX(20px); }
+
+    /* Avatar URL input */
+    .avatar-preview-row { display: flex; align-items: center; gap: 12px; }
+    .avatar-preview-img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 600; color: #fff; flex-shrink: 0; overflow: hidden; }
+    .avatar-preview-img img { width: 100%; height: 100%; object-fit: cover; }
+    .setting-input { font-family: 'DM Mono', monospace; font-size: .8rem; padding: 9px 12px; border: 1px solid var(--border); background: var(--paper); color: var(--ink); border-radius: 2px; outline: none; width: 100%; transition: border-color .15s, box-shadow .15s; }
+    .setting-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .setting-hint { font-size: .68rem; color: var(--muted); }
+
+    /* Color swatches */
     .color-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
-    .swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform .15s, border-color .15s; flex-shrink: 0; }
+    .swatch { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform .15s, border-color .15s; flex-shrink: 0; }
     .swatch:hover { transform: scale(1.15); }
     .swatch.selected { border-color: var(--ink); transform: scale(1.1); }
     .color-custom { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
-    .color-custom label { font-family: 'DM Mono', monospace; font-size: .65rem; color: var(--muted); }
-    .color-custom input[type="color"] { width: 36px; height: 28px; border: 1px solid var(--border); border-radius: 2px; cursor: pointer; background: none; padding: 2px; }
+    .color-custom label { font-family: 'DM Mono', monospace; font-size: .63rem; color: var(--muted); }
+    .color-custom input[type="color"] { width: 34px; height: 26px; border: 1px solid var(--border); border-radius: 2px; cursor: pointer; background: none; padding: 2px; }
+
+    /* Preview */
     .color-preview { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--cream); border: 1px solid var(--border); border-radius: 2px; }
-    .preview-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff; font-size: .9rem; }
-    .preview-name { font-weight: 600; font-size: .9rem; }
-    .preview-text { font-size: .82rem; color: var(--muted); margin-top: 2px; }
-    .settings-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
-    .btn-cancel { font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .08em; padding: 8px 16px; background: none; color: var(--muted); border: 1px solid var(--border); border-radius: 2px; cursor: pointer; transition: border-color .15s, color .15s; }
+    .preview-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; object-fit: cover; }
+    .preview-avatar-ph { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff; font-size: .9rem; }
+    .preview-name { font-weight: 600; font-size: .88rem; }
+    .preview-text { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+
+    /* Role assign section (developer only) */
+    .role-assign-row { display: flex; gap: 8px; }
+    .role-assign-row .setting-input { flex: 1; }
+    .role-select { font-family: 'DM Mono', monospace; font-size: .75rem; padding: 9px 10px; border: 1px solid var(--border); background: var(--paper); color: var(--ink); border-radius: 2px; outline: none; cursor: pointer; }
+    .btn-assign { font-family: 'DM Mono', monospace; font-size: .7rem; letter-spacing: .08em; padding: 9px 14px; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; cursor: pointer; white-space: nowrap; transition: background .15s; }
+    .btn-assign:hover { background: var(--accent); }
+
+    .settings-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; position: sticky; bottom: 0; background: var(--surface); }
+    .btn-cancel { font-family: 'DM Mono', monospace; font-size: .7rem; letter-spacing: .08em; padding: 8px 14px; background: none; color: var(--muted); border: 1px solid var(--border); border-radius: 2px; cursor: pointer; transition: border-color .15s, color .15s; }
     .btn-cancel:hover { border-color: var(--ink); color: var(--ink); }
-    .btn-save { font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .08em; padding: 8px 16px; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); border-radius: 2px; cursor: pointer; transition: background .15s; }
+    .btn-save { font-family: 'DM Mono', monospace; font-size: .7rem; letter-spacing: .08em; padding: 8px 14px; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); border-radius: 2px; cursor: pointer; transition: background .15s; }
     .btn-save:hover { background: var(--accent); border-color: var(--accent); }
     .btn-save:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Feedback messages */
+    .feedback { font-size: .7rem; min-height: 1.2em; margin-top: 4px; }
+    .feedback.ok  { color: #4caf50; }
+    .feedback.err { color: var(--danger); }
 
     /* -- Overlay -- */
     #overlay { position: fixed; inset: 0; background: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 200; transition: opacity .3s; }
     #overlay.hidden { opacity: 0; pointer-events: none; }
     .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--ink); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* -- Responsive -- */
+    @media (max-width: 600px) {
+      .app { grid-template-columns: 1fr; grid-template-areas: "header" "status" "chat" "typing" "input"; }
+      .online-sidebar { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -182,7 +214,7 @@
 <div id="overlay">
   <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--ink)">Synapse</div>
   <div class="spinner"></div>
-  <div style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Connecting…</div>
+  <div style="font-family:'DM Mono',monospace;font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)">Connecting…</div>
 </div>
 
 <!-- Settings -->
@@ -193,13 +225,30 @@
       <button class="settings-close" onclick="closeSettings()">✕</button>
     </div>
     <div class="settings-body">
+
+      <!-- Theme -->
       <div class="setting-row">
         <div class="setting-label">Appearance</div>
         <div class="theme-row">
-          <span style="font-size:.88rem">Dark mode</span>
+          <span style="font-size:.86rem">Dark mode</span>
           <button class="toggle-pill on" id="themeToggle" onclick="toggleThemeFromSettings()"></button>
         </div>
       </div>
+
+      <!-- Avatar URL -->
+      <div class="setting-row">
+        <div class="setting-label">Profile picture</div>
+        <div class="avatar-preview-row">
+          <div class="avatar-preview-img" id="avatarPreviewWrap"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+            <input class="setting-input" id="avatarUrlInput" type="url" placeholder="https://example.com/your-photo.jpg" oninput="previewAvatar(this.value)">
+            <div class="setting-hint">Paste a direct link to any image (HTTPS). Leave blank to use your initial.</div>
+          </div>
+        </div>
+        <div class="feedback" id="avatarFeedback"></div>
+      </div>
+
+      <!-- Username colour -->
       <div class="setting-row">
         <div class="setting-label">Username colour</div>
         <div class="color-swatches" id="colorSwatches"></div>
@@ -208,16 +257,36 @@
           <input type="color" id="customColor" oninput="selectCustomColor(this.value)">
         </div>
       </div>
+
+      <!-- Preview -->
       <div class="setting-row">
         <div class="setting-label">Preview</div>
         <div class="color-preview">
-          <div class="preview-avatar" id="previewAvatar"></div>
+          <div id="previewAvatarWrap"></div>
           <div>
             <div class="preview-name" id="previewName"></div>
             <div class="preview-text">This is what your messages look like.</div>
           </div>
         </div>
       </div>
+
+      <!-- Role assignment - developer only -->
+      <div class="setting-row" id="roleSection" style="display:none">
+        <div class="setting-label">Assign Role</div>
+        <div class="role-assign-row">
+          <input class="setting-input" id="roleTargetInput" placeholder="Username" autocomplete="off" autocorrect="off">
+          <select class="role-select" id="roleSelect">
+            <option value="member">Member</option>
+            <option value="vip">VIP</option>
+            <option value="moderator">Moderator</option>
+            <option value="admin">Admin</option>
+            <option value="developer">Developer</option>
+          </select>
+          <button class="btn-assign" onclick="assignRole()">Assign</button>
+        </div>
+        <div class="feedback" id="roleFeedback"></div>
+      </div>
+
     </div>
     <div class="settings-footer">
       <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
@@ -230,19 +299,22 @@
   <header>
     <div class="header-left">
       <span class="logo">Synapse</span>
+      <span class="room-tag"># general</span>
     </div>
     <div class="header-right">
       <div class="user-chip" id="userChip" onclick="toggleDropdown()">
-        <div class="chip-avatar" id="chipAvatar"></div>
+        <div id="chipAvatarWrap"></div>
         <span id="chipName"></span>
-        <span style="font-size:.6rem;opacity:.5">▾</span>
+        <span style="font-size:.58rem;opacity:.5">▾</span>
         <div class="dropdown" id="dropdown">
-          <div class="dropdown-header">
-            <div class="dn" id="dropDisplay"></div>
-            <div class="un" id="dropUser"></div>
+          <div class="dd-header">
+            <div class="dd-dn" id="ddDisplay"></div>
+            <div class="dd-un" id="ddUser"></div>
+            <span class="dd-role" id="ddRole"></span>
           </div>
-          <button class="dropdown-item" onclick="openSettings(); event.stopPropagation()">⚙ Settings</button>
-          <button class="dropdown-item danger" onclick="logout()">⏻ Sign Out</button>
+          <button class="dd-item" onclick="openSettings(); event.stopPropagation()">⚙ Settings</button>
+          <button class="dd-item danger" id="clearChatBtn" onclick="clearChat(); event.stopPropagation()">🗑 Clear Chat</button>
+          <button class="dd-item danger" onclick="logout()">⏻ Sign Out</button>
         </div>
       </div>
     </div>
@@ -251,7 +323,6 @@
   <div class="status-bar">
     <div class="status-dot green" id="statusDot"></div>
     <span id="statusText">Connected</span>
-    <span style="margin-left:auto" id="onlineCount"></span>
   </div>
 
   <div id="chat"></div>
@@ -267,6 +338,11 @@
       <span id="charCount"></span>
     </div>
   </div>
+
+  <div class="online-sidebar">
+    <div class="sidebar-header">Online - <span id="onlineCount">0</span></div>
+    <div class="online-list" id="onlineList"></div>
+  </div>
 </div>
 
 <script src="synapse-config.js"></script>
@@ -276,44 +352,47 @@ const token = Synapse.getToken();
 const user  = Synapse.getUser();
 if (!token || !user) { window.location.href = 'index.html'; }
 
-const { username, displayName } = user;
+let { username, displayName, role, avatarUrl, color: savedColor } = user;
 const sessionId = crypto.randomUUID();
 
-// --- Palette ------------------------------------------------------------------
-const PALETTE = [
-  '#c8502a','#e0673d','#2e6da4','#4a8c3f','#7b5ea7',
-  '#b5892a','#3a7d7d','#a43a5c','#4a7ab5','#c4963a',
-  '#5a9e6f','#9b4dca','#d4724a','#3d8fb5','#7a4a9e',
-];
+// --- Constants ----------------------------------------------------------------
+const PALETTE = ['#c8502a','#e0673d','#2e6da4','#4a8c3f','#7b5ea7','#b5892a','#3a7d7d','#a43a5c','#4a7ab5','#c4963a','#5a9e6f','#9b4dca','#d4724a','#3d8fb5','#7a4a9e'];
+const ROLE_META = {
+  developer: { label: 'DEV',   color: '#e0673d' },
+  admin:     { label: 'ADMIN', color: '#e74c3c' },
+  moderator: { label: 'MOD',   color: '#3498db' },
+  vip:       { label: 'VIP',   color: '#f1c40f' },
+  member:    { label: null,    color: null },
+};
+const CAN_CLEAR = ['developer', 'admin', 'moderator'];
 
 // --- State --------------------------------------------------------------------
-let myColor     = localStorage.getItem(`synapse_color_${username}`) || Synapse.colorFor(username);
+let myColor      = savedColor || localStorage.getItem(`synapse_color_${username}`) || Synapse.colorFor(username);
+let myAvatarUrl  = avatarUrl  || localStorage.getItem(`synapse_avatar_${username}`) || '';
 let pendingColor = myColor;
-const userColors = {};
-const colorFetchCache = new Set();
+let pendingAvatar = myAvatarUrl;
 
-// message id → DOM element, for deletion
-const msgElements = new Map();
+const userProfiles = {}; // username → { color, avatarUrl, role }
+const profileFetchCache = new Set();
+const msgElements = new Map(); // msgId → DOM element
 
 // --- DOM ----------------------------------------------------------------------
 const chat             = document.getElementById('chat');
 const messageInput     = document.getElementById('messageInput');
 const statusDot        = document.getElementById('statusDot');
 const statusText       = document.getElementById('statusText');
-const onlineCountEl    = document.getElementById('onlineCount');
 const typingIndicator  = document.getElementById('typingIndicator');
 const charCountEl      = document.getElementById('charCount');
 const overlay          = document.getElementById('overlay');
 const dropdown         = document.getElementById('dropdown');
 const settingsBackdrop = document.getElementById('settingsBackdrop');
 const themeToggle      = document.getElementById('themeToggle');
+const onlineList       = document.getElementById('onlineList');
+const onlineCount      = document.getElementById('onlineCount');
 
-// --- Theme - read from localStorage, fall back to dark -----------------------
-// Migrate old 'light' default by only using stored value if explicitly set
-const storedTheme = localStorage.getItem('synapse_theme');
-let currentTheme = storedTheme ?? 'dark';
+// --- Theme --------------------------------------------------------------------
+let currentTheme = localStorage.getItem('synapse_theme') ?? 'dark';
 applyTheme(currentTheme);
-
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   localStorage.setItem('synapse_theme', t);
@@ -322,30 +401,60 @@ function applyTheme(t) {
 }
 function toggleThemeFromSettings() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
 
+// --- Avatar helpers -----------------------------------------------------------
+function makeAvatarEl(avatarUrl, name, color, className, size = 40) {
+  if (avatarUrl) {
+    const img = document.createElement('img');
+    img.src = avatarUrl; img.className = className;
+    img.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;`;
+    img.onerror = () => { img.style.display = 'none'; };
+    return img;
+  }
+  const ph = document.createElement('div');
+  ph.className = className + '-ph';
+  ph.textContent = (name || '?').charAt(0).toUpperCase();
+  ph.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${size*0.4}px;font-weight:600;color:#fff;flex-shrink:0;`;
+  return ph;
+}
+
 // --- Header -------------------------------------------------------------------
 function refreshHeader() {
-  const chipAvatar = document.getElementById('chipAvatar');
-  chipAvatar.textContent     = (displayName || username).charAt(0).toUpperCase();
-  chipAvatar.style.background = myColor;
+  const wrap = document.getElementById('chipAvatarWrap');
+  wrap.innerHTML = '';
+  wrap.appendChild(makeAvatarEl(myAvatarUrl, displayName || username, myColor, 'chip-avatar', 20));
   document.getElementById('chipName').textContent    = displayName || username;
-  document.getElementById('dropDisplay').textContent = displayName || username;
-  document.getElementById('dropUser').textContent    = '@' + username;
+  document.getElementById('ddDisplay').textContent   = displayName || username;
+  document.getElementById('ddUser').textContent      = '@' + username;
+  const roleEl = document.getElementById('ddRole');
+  const rm = ROLE_META[role] || ROLE_META.member;
+  if (rm.label) {
+    roleEl.textContent  = rm.label;
+    roleEl.style.background = rm.color + '22';
+    roleEl.style.color      = rm.color;
+    roleEl.style.display    = 'inline-block';
+  } else {
+    roleEl.style.display = 'none';
+  }
+  // Show clear chat + role section for staff
+  const canClear = CAN_CLEAR.includes(role);
+  document.getElementById('clearChatBtn').style.display = canClear ? 'flex' : 'none';
+  document.getElementById('roleSection').style.display  = role === 'developer' ? 'flex' : 'none';
 }
 refreshHeader();
 
-// Fetch saved color from server
+// Fetch fresh profile from server
 (async () => {
   try {
     const res  = await fetch(`${Synapse.api}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } });
     const data = await res.json();
-    if (data.color) {
-      myColor = data.color; pendingColor = data.color;
-      localStorage.setItem(`synapse_color_${username}`, myColor);
-      userColors[username] = myColor;
-      refreshHeader();
-      document.querySelectorAll(`.msg-author[data-user="${username}"]`).forEach(el => el.style.color = myColor);
-      document.querySelectorAll(`.msg-avatar[data-user="${username}"]`).forEach(el => el.style.background = myColor);
-    }
+    if (data.color)     { myColor = data.color; pendingColor = data.color; localStorage.setItem(`synapse_color_${username}`, myColor); }
+    if (data.avatarUrl) { myAvatarUrl = data.avatarUrl; pendingAvatar = data.avatarUrl; localStorage.setItem(`synapse_avatar_${username}`, myAvatarUrl); }
+    if (data.role)      { role = data.role; }
+    userProfiles[username] = { color: myColor, avatarUrl: myAvatarUrl, role };
+    refreshHeader();
+    patchUserElements(username, myColor, myAvatarUrl);
+    // Update stored user
+    Synapse.saveSession(token, { username, displayName: data.displayName || displayName, role, color: myColor, avatarUrl: myAvatarUrl });
   } catch {}
 })();
 
@@ -354,6 +463,18 @@ function toggleDropdown() { dropdown.classList.toggle('open'); }
 document.addEventListener('click', e => {
   if (!document.getElementById('userChip').contains(e.target)) dropdown.classList.remove('open');
 });
+
+// --- Clear chat ---------------------------------------------------------------
+async function clearChat() {
+  dropdown.classList.remove('open');
+  if (!confirm('Clear the entire chat history? This cannot be undone.')) return;
+  try {
+    const res = await fetch(`${Synapse.api}/admin/clear`, {
+      method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) { const d = await res.json(); alert(d.error || 'Failed to clear chat.'); }
+  } catch { alert('Network error.'); }
+}
 
 // --- Logout -------------------------------------------------------------------
 function logout() {
@@ -365,23 +486,14 @@ function logout() {
 
 // --- Settings -----------------------------------------------------------------
 function buildSwatches() {
-  const container = document.getElementById('colorSwatches');
-  container.innerHTML = '';
+  const c = document.getElementById('colorSwatches'); c.innerHTML = '';
   PALETTE.forEach(color => {
     const sw = document.createElement('button');
     sw.className = 'swatch' + (pendingColor === color ? ' selected' : '');
-    sw.style.background = color;
-    sw.title = color;
-    sw.onclick = () => selectColor(color);
-    container.appendChild(sw);
+    sw.style.background = color; sw.title = color;
+    sw.onclick = () => { pendingColor = color; document.getElementById('customColor').value = color; buildSwatches(); updatePreview(); };
+    c.appendChild(sw);
   });
-}
-
-function selectColor(color) {
-  pendingColor = color;
-  document.getElementById('customColor').value = color;
-  buildSwatches();
-  updatePreview();
 }
 
 function selectCustomColor(color) {
@@ -390,10 +502,31 @@ function selectCustomColor(color) {
   updatePreview();
 }
 
+function previewAvatar(url) {
+  pendingAvatar = url;
+  updateAvatarPreview();
+  updatePreview();
+}
+
+function updateAvatarPreview() {
+  const wrap = document.getElementById('avatarPreviewWrap');
+  wrap.innerHTML = '';
+  if (pendingAvatar) {
+    const img = document.createElement('img');
+    img.src = pendingAvatar; img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+    img.onerror = () => { wrap.innerHTML = (displayName || username).charAt(0).toUpperCase(); wrap.style.background = pendingColor; };
+    wrap.appendChild(img);
+  } else {
+    wrap.textContent = (displayName || username).charAt(0).toUpperCase();
+    wrap.style.background = pendingColor;
+    wrap.style.color = '#fff';
+  }
+}
+
 function updatePreview() {
-  const av = document.getElementById('previewAvatar');
-  av.textContent = (displayName || username).charAt(0).toUpperCase();
-  av.style.background = pendingColor;
+  const wrap = document.getElementById('previewAvatarWrap');
+  wrap.innerHTML = '';
+  wrap.appendChild(makeAvatarEl(pendingAvatar, displayName || username, pendingColor, 'preview-avatar', 36));
   const name = document.getElementById('previewName');
   name.textContent = displayName || username;
   name.style.color = pendingColor;
@@ -401,10 +534,15 @@ function updatePreview() {
 
 function openSettings() {
   dropdown.classList.remove('open');
-  pendingColor = myColor;
+  pendingColor  = myColor;
+  pendingAvatar = myAvatarUrl;
+  document.getElementById('avatarUrlInput').value = myAvatarUrl;
+  document.getElementById('avatarFeedback').textContent = '';
+  document.getElementById('roleFeedback').textContent   = '';
   themeToggle.classList.toggle('on', currentTheme === 'dark');
   buildSwatches();
   document.getElementById('customColor').value = myColor;
+  updateAvatarPreview();
   updatePreview();
   settingsBackdrop.classList.add('open');
 }
@@ -415,25 +553,85 @@ function handleBackdropClick(e) { if (e.target === settingsBackdrop) closeSettin
 async function saveSettings() {
   const btn = document.getElementById('saveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
+  const fb = document.getElementById('avatarFeedback');
+  fb.textContent = ''; fb.className = 'feedback';
+
   try {
-    const res = await fetch(`${Synapse.api}/auth/color`, {
+    // Save color
+    await fetch(`${Synapse.api}/auth/color`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ color: pendingColor }),
     });
-    if (!res.ok) throw new Error();
-    myColor = pendingColor;
+
+    // Save avatar URL
+    const avatarRes = await fetch(`${Synapse.api}/auth/avatar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ avatarUrl: pendingAvatar }),
+    });
+    if (!avatarRes.ok) {
+      const d = await avatarRes.json();
+      fb.textContent = d.error || 'Invalid avatar URL.'; fb.className = 'feedback err';
+      btn.disabled = false; btn.textContent = 'Save'; return;
+    }
+
+    myColor = pendingColor; myAvatarUrl = pendingAvatar;
     localStorage.setItem(`synapse_color_${username}`, myColor);
-    userColors[username] = myColor;
+    localStorage.setItem(`synapse_avatar_${username}`, myAvatarUrl);
+    userProfiles[username] = { color: myColor, avatarUrl: myAvatarUrl, role };
     refreshHeader();
-    document.querySelectorAll(`.msg-author[data-user="${username}"]`).forEach(el => el.style.color = myColor);
-    document.querySelectorAll(`.msg-avatar[data-user="${username}"]`).forEach(el => el.style.background = myColor);
+    patchUserElements(username, myColor, myAvatarUrl);
     closeSettings();
-  } catch {
-    alert('Could not save - please try again.');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Save';
+  } catch { fb.textContent = 'Network error - please try again.'; fb.className = 'feedback err'; }
+  finally { btn.disabled = false; btn.textContent = 'Save'; }
+}
+
+async function assignRole() {
+  const targetUsername = document.getElementById('roleTargetInput').value.trim();
+  const newRole        = document.getElementById('roleSelect').value;
+  const fb             = document.getElementById('roleFeedback');
+  fb.textContent = ''; fb.className = 'feedback';
+  if (!targetUsername) { fb.textContent = 'Enter a username.'; fb.className = 'feedback err'; return; }
+
+  try {
+    const res  = await fetch(`${Synapse.api}/admin/role`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ username: targetUsername, role: newRole }),
+    });
+    const data = await res.json();
+    if (!res.ok) { fb.textContent = data.error || 'Failed.'; fb.className = 'feedback err'; return; }
+    fb.textContent = `${targetUsername} is now ${newRole}.`; fb.className = 'feedback ok';
+    document.getElementById('roleTargetInput').value = '';
+  } catch { fb.textContent = 'Network error.'; fb.className = 'feedback err'; }
+}
+
+// --- Profile fetch & DOM patching ---------------------------------------------
+async function resolveProfile(uname) {
+  if (userProfiles[uname]) return userProfiles[uname];
+  if (uname === username) {
+    userProfiles[uname] = { color: myColor, avatarUrl: myAvatarUrl, role };
+    return userProfiles[uname];
   }
+  if (profileFetchCache.has(uname)) return { color: Synapse.colorFor(uname), avatarUrl: '', role: 'member' };
+  profileFetchCache.add(uname);
+  try {
+    const res  = await fetch(`${Synapse.api}/auth/profile/${encodeURIComponent(uname)}`);
+    const data = await res.json();
+    const profile = { color: data.color || Synapse.colorFor(uname), avatarUrl: data.avatarUrl || '', role: data.role || 'member' };
+    userProfiles[uname] = profile;
+    patchUserElements(uname, profile.color, profile.avatarUrl);
+    return profile;
+  } catch { return { color: Synapse.colorFor(uname), avatarUrl: '', role: 'member' }; }
+}
+
+function patchUserElements(uname, color, avatarUrl) {
+  document.querySelectorAll(`.msg-author[data-user="${uname}"]`).forEach(el => el.style.color = color);
+  document.querySelectorAll(`.msg-avatar-slot[data-user="${uname}"]`).forEach(wrap => {
+    wrap.innerHTML = '';
+    wrap.appendChild(makeAvatarEl(avatarUrl, uname, color, 'msg-avatar', 40));
+  });
 }
 
 // --- WebSocket ----------------------------------------------------------------
@@ -456,10 +654,13 @@ function connect() {
 
   socket.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    if (data.type === 'history')        { if (!historyRendered) renderHistory(data.messages); return; }
-    if (data.type === 'online_count')   { onlineCountEl.textContent = `${data.count} online`; return; }
-    if (data.type === 'typing')         { handleTyping(data); return; }
-    if (data.type === 'delete')         { handleRemoteDelete(data.msgId); return; }
+    if (data.type === 'history')      { if (!historyRendered) renderHistory(data.messages); return; }
+    if (data.type === 'online_list')  { renderOnlineList(data.users); return; }
+    if (data.type === 'typing')       { handleTyping(data); return; }
+    if (data.type === 'delete')       { handleRemoteDelete(data.msgId); return; }
+    if (data.type === 'chat_cleared') { handleChatCleared(data.clearedBy); return; }
+    if (data.type === 'role_update')  { handleRoleUpdate(data); return; }
+    if (data.type === 'avatar_update'){ handleAvatarUpdate(data); return; }
     addMessage(data, false);
     if (data.username && data.username !== username && document.hidden && Notification.permission === 'granted') {
       new Notification(`Synapse · ${data.displayName || data.username}`, { body: data.message, silent: true });
@@ -480,139 +681,192 @@ setInterval(() => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.
 window.addEventListener('beforeunload', () => { if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'explicit_leave' })); });
 if (Notification.permission === 'default') Notification.requestPermission();
 
-// --- Delete message -----------------------------------------------------------
+// --- Online list --------------------------------------------------------------
+function renderOnlineList(users) {
+  onlineCount.textContent = users.length;
+  onlineList.innerHTML = '';
+
+  // Group by role order
+  const order = ['developer', 'admin', 'moderator', 'vip', 'member'];
+  users.sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role));
+
+  let lastRole = null;
+  for (const u of users) {
+    if (u.role !== lastRole) {
+      lastRole = u.role;
+      const rm = ROLE_META[u.role] || ROLE_META.member;
+      const label = rm.label || 'Member';
+      const sec = document.createElement('div');
+      sec.style.cssText = `font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:${rm.color || 'var(--muted)'};padding:8px 8px 2px;`;
+      sec.textContent = label + 's';
+      onlineList.appendChild(sec);
+    }
+
+    const color = userProfiles[u.username]?.color || u.color || Synapse.colorFor(u.username);
+    const avatar = userProfiles[u.username]?.avatarUrl || u.avatarUrl || '';
+
+    const row = document.createElement('div');
+    row.className = 'online-user';
+
+    const avatarWrap = document.createElement('div');
+    avatarWrap.className = 'ou-avatar-wrap';
+    avatarWrap.appendChild(makeAvatarEl(avatar, u.displayName || u.username, color, 'ou-avatar', 32));
+    const dot = document.createElement('div'); dot.className = 'ou-online-dot';
+    avatarWrap.appendChild(dot);
+
+    const info = document.createElement('div'); info.className = 'ou-info';
+    const name = document.createElement('div'); name.className = 'ou-name'; name.textContent = u.displayName || u.username; name.style.color = color;
+    info.appendChild(name);
+
+    const rm = ROLE_META[u.role] || ROLE_META.member;
+    if (rm.label) {
+      const badge = document.createElement('span'); badge.className = 'ou-badge';
+      badge.textContent = rm.label;
+      badge.style.background = rm.color + '22'; badge.style.color = rm.color;
+      info.appendChild(badge);
+    }
+
+    row.appendChild(avatarWrap); row.appendChild(info);
+    onlineList.appendChild(row);
+  }
+}
+
+// --- Chat cleared -------------------------------------------------------------
+function handleChatCleared(clearedBy) {
+  chat.innerHTML = '';
+  msgElements.clear();
+  lastAuthor = null; lastMsgTime = 0; lastIsHistory = null;
+  const div = document.createElement('div');
+  div.className = 'system-msg';
+  div.textContent = `Chat was cleared by ${clearedBy}.`;
+  chat.appendChild(div);
+}
+
+// --- Role update --------------------------------------------------------------
+function handleRoleUpdate(data) {
+  if (userProfiles[data.username]) userProfiles[data.username].role = data.role;
+  if (data.username === username) {
+    role = data.role;
+    refreshHeader();
+  }
+  // Update badges on existing messages
+  const rm = ROLE_META[data.role] || ROLE_META.member;
+  document.querySelectorAll(`.msg-badge[data-user="${data.username}"]`).forEach(el => {
+    if (rm.label) { el.textContent = rm.label; el.style.background = rm.color + '22'; el.style.color = rm.color; el.style.display = 'inline'; }
+    else { el.style.display = 'none'; }
+  });
+}
+
+// --- Avatar update ------------------------------------------------------------
+function handleAvatarUpdate(data) {
+  if (userProfiles[data.username]) userProfiles[data.username].avatarUrl = data.avatarUrl;
+  if (data.username === username) { myAvatarUrl = data.avatarUrl; refreshHeader(); }
+  patchUserElements(data.username, userProfiles[data.username]?.color || Synapse.colorFor(data.username), data.avatarUrl);
+}
+
+// --- Delete -------------------------------------------------------------------
 function deleteMessage(msgId, groupEl) {
   if (!confirm('Delete this message?')) return;
-  // Optimistic removal
-  groupEl.remove();
-  msgElements.delete(msgId);
-  // Tell the server / other clients
-  if (socket?.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({ type: 'delete', msgId }));
-  }
+  groupEl.remove(); msgElements.delete(msgId);
+  if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: 'delete', msgId }));
 }
 
 function handleRemoteDelete(msgId) {
   const el = msgElements.get(msgId);
-  if (!el) return;
-  el.remove();
-  msgElements.delete(msgId);
+  if (el) { el.remove(); msgElements.delete(msgId); }
 }
 
-// --- Color resolution ---------------------------------------------------------
-async function resolveColor(uname) {
-  if (userColors[uname]) return userColors[uname];
-  if (uname === username) { userColors[uname] = myColor; return myColor; }
-  if (colorFetchCache.has(uname)) return Synapse.colorFor(uname);
-  colorFetchCache.add(uname);
-  try {
-    const res   = await fetch(`${Synapse.api}/auth/color/${encodeURIComponent(uname)}`);
-    const data  = await res.json();
-    const color = data.color || Synapse.colorFor(uname);
-    userColors[uname] = color;
-    document.querySelectorAll(`.msg-author[data-user="${uname}"]`).forEach(el => el.style.color = color);
-    document.querySelectorAll(`.msg-avatar[data-user="${uname}"]`).forEach(el => el.style.background = color);
-    return color;
-  } catch { return Synapse.colorFor(uname); }
-}
-
-// --- Render -------------------------------------------------------------------
+// --- Render history -----------------------------------------------------------
 function renderHistory(messages) {
   lastAuthor = null; lastMsgTime = 0; lastIsHistory = null;
   for (const msg of messages) addMessage(msg, true);
   const sep = document.createElement('div');
-  sep.className = 'history-separator';
-  sep.textContent = 'Earlier messages above · Live below';
+  sep.className = 'history-separator'; sep.textContent = 'Earlier messages above · Live below';
   chat.appendChild(sep);
   lastAuthor = null; lastMsgTime = 0; lastIsHistory = null;
   chat.scrollTop = chat.scrollHeight;
   historyRendered = true;
 }
 
+// --- Add message -------------------------------------------------------------
 function addMessage(data, isHistory) {
   const atBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 80;
 
   if (data.type === 'system' || data.type === 'join' || data.type === 'leave') {
     const div = document.createElement('div');
-    div.className = 'system-msg';
-    div.textContent = data.message || '';
-    chat.appendChild(div);
-    lastAuthor = null; lastMsgTime = 0;
+    div.className = 'system-msg'; div.textContent = data.message || '';
+    chat.appendChild(div); lastAuthor = null; lastMsgTime = 0;
     if (atBottom || !isHistory) chat.scrollTop = chat.scrollHeight;
     return;
   }
 
   const msgTime    = data.time || Date.now();
   const author     = data.username || 'Anonymous';
-  // Assign a stable ID to history messages that predate the msgId field
   const msgId      = data.msgId || `hist-${author}-${msgTime}`;
-  const isContinued = author === lastAuthor && lastIsHistory === isHistory && (msgTime - lastMsgTime) < GROUP_MS;
   const isMine     = author === username;
+  const isContinued = author === lastAuthor && lastIsHistory === isHistory && (msgTime - lastMsgTime) < GROUP_MS;
 
   lastAuthor = author; lastMsgTime = msgTime; lastIsHistory = isHistory;
 
-  const cachedColor = userColors[author] || (isMine ? myColor : Synapse.colorFor(author));
+  // Use cached profile or fall back immediately; async will patch later
+  const profile = userProfiles[author];
+  const color   = profile?.color    || (isMine ? myColor : (data.color || Synapse.colorFor(author)));
+  const avatar  = profile?.avatarUrl || (isMine ? myAvatarUrl : (data.avatarUrl || ''));
+  const msgRole = profile?.role     || data.role || 'member';
+  const badge   = ROLE_META[msgRole] || ROLE_META.member;
 
   const group = document.createElement('div');
   group.className = ['msg-group', isContinued ? 'continued' : '', isHistory ? 'history-msg' : ''].filter(Boolean).join(' ');
 
-  // Delete button - show on own messages (live and history)
-  if (isMine && msgId) {
+  // Delete button
+  if (isMine) {
     const delBtn = document.createElement('button');
-    delBtn.className = 'msg-delete';
-    delBtn.textContent = '✕ Delete';
+    delBtn.className = 'msg-delete'; delBtn.textContent = '✕ Delete';
     delBtn.onclick = () => deleteMessage(msgId, group);
     group.appendChild(delBtn);
   }
 
   // Avatar col
-  const avatarCol = document.createElement('div');
-  avatarCol.className = 'msg-avatar-col';
-  const miniTime = document.createElement('span');
-  miniTime.className = 'mini-time';
-  miniTime.textContent = formatTime(msgTime);
+  const avatarCol = document.createElement('div'); avatarCol.className = 'msg-avatar-col';
+  const miniTime = document.createElement('span'); miniTime.className = 'mini-time'; miniTime.textContent = formatTime(msgTime);
   avatarCol.appendChild(miniTime);
   if (!isContinued) {
-    const av = document.createElement('div');
-    av.className = 'msg-avatar';
-    av.dataset.user = author;
-    av.textContent = (data.displayName || author).charAt(0).toUpperCase();
-    av.style.background = cachedColor;
-    avatarCol.appendChild(av);
+    const slot = document.createElement('div'); slot.className = 'msg-avatar-slot'; slot.dataset.user = author;
+    slot.appendChild(makeAvatarEl(avatar, data.displayName || author, color, 'msg-avatar', 40));
+    avatarCol.appendChild(slot);
   }
 
   // Content col
-  const contentCol = document.createElement('div');
-  contentCol.className = 'msg-content';
+  const contentCol = document.createElement('div'); contentCol.className = 'msg-content';
   if (!isContinued) {
-    const header = document.createElement('div');
-    header.className = 'msg-header';
-    const authorEl = document.createElement('span');
-    authorEl.className = 'msg-author';
-    authorEl.dataset.user = author;
-    authorEl.textContent = data.displayName || author;
-    authorEl.style.color = cachedColor;
-    const timeEl = document.createElement('span');
-    timeEl.className = 'msg-timestamp';
-    timeEl.textContent = formatDateTime(msgTime);
+    const header = document.createElement('div'); header.className = 'msg-header';
+    const authorEl = document.createElement('span'); authorEl.className = 'msg-author'; authorEl.dataset.user = author; authorEl.textContent = data.displayName || author; authorEl.style.color = color;
     header.appendChild(authorEl);
+    if (badge.label) {
+      const badgeEl = document.createElement('span'); badgeEl.className = 'msg-badge'; badgeEl.dataset.user = author;
+      badgeEl.textContent = badge.label; badgeEl.style.background = badge.color + '22'; badgeEl.style.color = badge.color;
+      header.appendChild(badgeEl);
+    } else {
+      // Still render hidden badge so role updates can target it
+      const badgeEl = document.createElement('span'); badgeEl.className = 'msg-badge'; badgeEl.dataset.user = author; badgeEl.style.display = 'none';
+      header.appendChild(badgeEl);
+    }
+    const timeEl = document.createElement('span'); timeEl.className = 'msg-timestamp'; timeEl.textContent = formatDateTime(msgTime);
     header.appendChild(timeEl);
     contentCol.appendChild(header);
   }
 
-  const textEl = document.createElement('div');
-  textEl.className = 'msg-text';
-  textEl.textContent = data.message || '';
+  const textEl = document.createElement('div'); textEl.className = 'msg-text'; textEl.textContent = data.message || '';
   contentCol.appendChild(textEl);
 
-  group.appendChild(avatarCol);
-  group.appendChild(contentCol);
+  group.appendChild(avatarCol); group.appendChild(contentCol);
   chat.appendChild(group);
-
   msgElements.set(msgId, group);
+
   if (atBottom || !isHistory) chat.scrollTop = chat.scrollHeight;
 
-  resolveColor(author);
+  // Async profile resolution
+  resolveProfile(author);
 }
 
 // --- Typing -------------------------------------------------------------------
@@ -633,13 +887,13 @@ function updateTypingDisplay() {
 function sendMessage() {
   const text = messageInput.value.trim();
   if (!text || !isConnected) return;
-  socket.send(JSON.stringify({ username, message: text }));
+  socket.send(JSON.stringify({ type: 'message', username, message: text }));
   messageInput.value = ''; messageInput.style.height = 'auto';
   charCountEl.textContent = ''; charCountEl.className = '';
 }
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
-  messageInput.style.height = Math.min(messageInput.scrollHeight, 180) + 'px';
+  messageInput.style.height = Math.min(messageInput.scrollHeight, 160) + 'px';
   const len = messageInput.value.length;
   if (len > 1800) { charCountEl.textContent = `${2000 - len} remaining`; charCountEl.className = 'char-warn'; }
   else { charCountEl.textContent = ''; charCountEl.className = ''; }
