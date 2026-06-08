@@ -16,14 +16,6 @@ const Synapse = {
     localStorage.removeItem('synapse_user');
   },
 
-  async requireAuth() {
-    const token = this.getToken();
-    if (!token) { window.location.href = 'index.html'; return null; }
-    const user = this.getUser();
-    if (!user)  { window.location.href = 'index.html'; return null; }
-    return { token, user };
-  },
-
   colorFor(str) {
     const palette = ['#c8502a','#2e6da4','#4a8c3f','#7b5ea7','#b5892a','#3a7d7d','#a43a5c'];
     let h = 0;
