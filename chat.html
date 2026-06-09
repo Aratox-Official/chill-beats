@@ -26,7 +26,7 @@
     .app { height: 100vh; width: 100vw; display: grid; grid-template-columns: 1fr 220px; grid-template-rows: auto auto 1fr auto auto; grid-template-areas: "header  sidebar" "status  sidebar" "chat    sidebar" "typing  sidebar" "input   sidebar"; }
 
     /* -- Header -- */
-    header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; }
+    header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; position: relative; }
     .header-left { display: flex; align-items: baseline; gap: 10px; }
     .logo { font-family: 'DM Serif Display', serif; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--ink); }
     .room-tag { font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 2px 7px; border-radius: 2px; }
@@ -206,6 +206,86 @@
       .app { grid-template-columns: 1fr; grid-template-areas: "header" "status" "chat" "typing" "input"; }
       .online-sidebar { display: none; }
     }
+
+    /* ── DM Icon in header center ─────────────────────────────────────────── */
+    .header-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; }
+    .dm-icon-btn { background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 2px; transition: background .15s; position: relative; }
+    .dm-icon-btn:hover { background: var(--cream); }
+    .dm-icon-btn img { width: 28px; height: 28px; opacity: .75; filter: var(--dm-icon-filter, none); transition: opacity .15s; }
+    [data-theme="dark"] .dm-icon-btn img { filter: invert(1) brightness(0.8); }
+    .dm-icon-btn:hover img { opacity: 1; }
+    .dm-unread-badge { position: absolute; top: -2px; right: -2px; background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: .52rem; font-weight: 700; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 3px; display: none; }
+    .dm-unread-badge.visible { display: flex; }
+
+    /* ── DM Conversations panel (dropdown from icon) ───────────────────────── */
+    .dm-panel { position: fixed; top: 54px; left: 50%; transform: translateX(-50%); width: 320px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; box-shadow: 4px 4px 0 var(--border); z-index: 200; display: none; flex-direction: column; max-height: 480px; }
+    .dm-panel.open { display: flex; }
+    .dm-panel-header { padding: 12px 14px 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .dm-panel-title { font-family: 'DM Serif Display', serif; font-size: .95rem; font-weight: 400; }
+    .dm-compose-btn { font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; padding: 5px 10px; cursor: pointer; transition: background .15s; }
+    .dm-compose-btn:hover { background: var(--accent); }
+    .dm-conv-list { overflow-y: auto; flex: 1; }
+    .dm-conv-list::-webkit-scrollbar { width: 4px; }
+    .dm-conv-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .dm-conv-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background .1s; }
+    .dm-conv-item:hover { background: var(--cream); }
+    .dm-conv-item:last-child { border-bottom: none; }
+    .dm-conv-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
+    .dm-conv-info { flex: 1; min-width: 0; }
+    .dm-conv-name { font-size: .84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dm-conv-preview { font-family: 'DM Mono', monospace; font-size: .62rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+    .dm-conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .dm-conv-time { font-family: 'DM Mono', monospace; font-size: .58rem; color: var(--muted); }
+    .dm-conv-unread { background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: .56rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
+    .dm-empty { padding: 28px 14px; text-align: center; font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--muted); }
+
+    /* ── Compose DM modal ──────────────────────────────────────────────────── */
+    .dm-compose-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 400; display: none; align-items: center; justify-content: center; }
+    .dm-compose-modal.open { display: flex; }
+    .dm-compose-card { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; width: min(340px, 92vw); box-shadow: 6px 6px 0 var(--border); animation: fadeUp .18s ease; }
+    .dm-compose-card-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .dm-compose-card-header h3 { font-family: 'DM Serif Display', serif; font-size: .95rem; font-weight: 400; }
+    .dm-compose-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .9rem; padding: 2px 6px; border-radius: 2px; transition: color .15s; }
+    .dm-compose-close:hover { color: var(--ink); }
+    .dm-compose-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .dm-compose-field { display: flex; flex-direction: column; gap: 5px; }
+    .dm-compose-field label { font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+    .dm-compose-input { font-family: 'DM Mono', monospace; font-size: .86rem; padding: 9px 12px; border: 1px solid var(--border); background: var(--paper); color: var(--ink); border-radius: 2px; outline: none; transition: border-color .15s, box-shadow .15s; }
+    .dm-compose-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .dm-compose-error { font-family: 'DM Mono', monospace; font-size: .64rem; color: var(--accent); min-height: 1em; }
+    .dm-compose-send { font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; padding: 10px; cursor: pointer; transition: background .15s; }
+    .dm-compose-send:hover { background: var(--accent); }
+
+    /* ── DM chat window (floating bottom-right) ────────────────────────────── */
+    .dm-window { position: fixed; bottom: 16px; right: 16px; width: 320px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; box-shadow: 4px 4px 0 var(--border), 8px 8px 0 var(--accent-dim); z-index: 300; display: none; flex-direction: column; max-height: 460px; animation: fadeUp .18s ease; }
+    .dm-window.open { display: flex; }
+    .dm-window-header { padding: 10px 12px; background: var(--cream); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: default; }
+    .dm-window-avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; }
+    .dm-window-name { flex: 1; font-size: .84rem; font-weight: 600; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dm-window-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .dm-window-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .8rem; padding: 2px 5px; border-radius: 2px; transition: color .15s, background .15s; }
+    .dm-window-btn:hover { color: var(--ink); background: var(--border); }
+    .dm-window-messages { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+    .dm-window-messages::-webkit-scrollbar { width: 4px; }
+    .dm-window-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .dm-msg { display: flex; flex-direction: column; max-width: 82%; animation: msgIn .12s ease; }
+    .dm-msg.mine { align-self: flex-end; align-items: flex-end; }
+    .dm-msg.theirs { align-self: flex-start; align-items: flex-start; }
+    .dm-msg-bubble { padding: 7px 11px; border-radius: 2px; font-size: .84rem; line-height: 1.5; word-break: break-word; white-space: pre-wrap; }
+    .dm-msg.mine .dm-msg-bubble { background: var(--ink); color: var(--paper); }
+    .dm-msg.theirs .dm-msg-bubble { background: var(--cream); color: var(--ink); border: 1px solid var(--border); }
+    .dm-msg-time { font-family: 'DM Mono', monospace; font-size: .54rem; color: var(--muted); margin-top: 2px; padding: 0 2px; }
+    .dm-typing-line { font-family: 'DM Mono', monospace; font-size: .64rem; color: var(--muted); padding: 2px 0; display: flex; align-items: center; gap: 5px; min-height: 18px; }
+    .dm-window-input-row { border-top: 1px solid var(--border); display: flex; align-items: flex-end; gap: 0; padding: 0; flex-shrink: 0; }
+    .dm-window-input { flex: 1; font-family: 'DM Sans', sans-serif; font-size: .84rem; padding: 9px 12px; background: none; border: none; color: var(--ink); outline: none; resize: none; min-height: 38px; max-height: 100px; line-height: 1.5; }
+    .dm-window-input::placeholder { color: var(--border); }
+    .dm-window-send { font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .06em; padding: 9px 12px; background: var(--ink); color: var(--paper); border: none; cursor: pointer; transition: background .15s; flex-shrink: 0; align-self: stretch; display: flex; align-items: center; }
+    .dm-window-send:hover { background: var(--accent); }
+    .dm-load-more { font-family: 'DM Mono', monospace; font-size: .6rem; color: var(--muted); text-align: center; padding: 4px; cursor: pointer; border-bottom: 1px solid var(--border); }
+    .dm-load-more:hover { color: var(--ink); }
+    .dm-window-minimised .dm-window-messages,
+    .dm-window-minimised .dm-window-input-row,
+    .dm-window-minimised .dm-typing-line { display: none; }
   </style>
 </head>
 <body>
@@ -294,11 +374,70 @@
   </div>
 </div>
 
-<div class="app">
+<!-- ── DM Conversations Panel ───────────────────────────────────────────── -->
+<div class="dm-panel" id="dmPanel">
+  <div class="dm-panel-header">
+    <span class="dm-panel-title">Messages</span>
+    <button class="dm-compose-btn" onclick="openComposeDM()">+ New</button>
+  </div>
+  <div class="dm-conv-list" id="dmConvList">
+    <div class="dm-empty" id="dmConvEmpty">No conversations yet.</div>
+  </div>
+</div>
+
+<!-- ── Compose DM Modal ─────────────────────────────────────────────────── -->
+<div class="dm-compose-modal" id="dmComposeModal" onclick="handleComposeBackdrop(event)">
+  <div class="dm-compose-card">
+    <div class="dm-compose-card-header">
+      <h3>New Message</h3>
+      <button class="dm-compose-close" onclick="closeComposeDM()">✕</button>
+    </div>
+    <div class="dm-compose-body">
+      <div class="dm-compose-field">
+        <label for="dmComposeUser">To (username)</label>
+        <input class="dm-compose-input" id="dmComposeUser" type="text" placeholder="their_handle" autocorrect="off" spellcheck="false" maxlength="32">
+      </div>
+      <div class="dm-compose-field">
+        <label for="dmComposeText">Message</label>
+        <textarea class="dm-compose-input" id="dmComposeText" rows="3" placeholder="Write something…" maxlength="2000" style="resize:vertical"></textarea>
+      </div>
+      <div class="dm-compose-error" id="dmComposeError"></div>
+      <button class="dm-compose-send" onclick="sendComposeDM()">Send Message →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DM Chat Window (floating) ────────────────────────────────────────── -->
+<div class="dm-window" id="dmWindow">
+  <div class="dm-window-header">
+    <div id="dmWindowAvatar"></div>
+    <span class="dm-window-name" id="dmWindowName"></span>
+    <div class="dm-window-actions">
+      <button class="dm-window-btn" id="dmMinBtn" onclick="toggleDMMinimise()" title="Minimise">─</button>
+      <button class="dm-window-btn" onclick="closeDMWindow()" title="Close">✕</button>
+    </div>
+  </div>
+  <div class="dm-load-more" id="dmLoadMore" onclick="loadMoreDMs()" style="display:none">Load earlier messages</div>
+  <div class="dm-window-messages" id="dmWindowMessages"></div>
+  <div class="dm-typing-line" id="dmTypingLine"></div>
+  <div class="dm-window-input-row">
+    <textarea class="dm-window-input" id="dmWindowInput" rows="1" placeholder="Message…" maxlength="2000"></textarea>
+    <button class="dm-window-send" onclick="sendDMFromWindow()">Send</button>
+  </div>
+</div>
   <header>
     <div class="header-left">
       <span class="logo">Synapse</span>
     </div>
+
+    <!-- DM icon — absolute center of header -->
+    <div class="header-center">
+      <button class="dm-icon-btn" id="dmIconBtn" onclick="toggleDMPanel(event)" title="Private Messages">
+        <img src="/chat-icon.png" alt="Private Messages">
+        <span class="dm-unread-badge" id="dmUnreadBadge"></span>
+      </button>
+    </div>
+
     <div class="header-right">
       <div class="user-chip" id="userChip" onclick="toggleDropdown()">
         <div id="chipAvatarWrap"></div>
@@ -908,6 +1047,392 @@ function formatDateTime(ts) {
   if (d.toDateString() === yesterday.toDateString()) return 'Yesterday at ' + formatTime(ts);
   return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ' at ' + formatTime(ts);
 }
+
+// =============================================================================
+// ── PRIVATE MESSAGES (DM) SYSTEM ─────────────────────────────────────────────
+// =============================================================================
+const DM = {
+  panelOpen:    false,
+  currentPeer:  null,           // username of open DM window
+  peerProfile:  {},             // { displayName, color, avatarUrl }
+  messages:     [],             // loaded messages for currentPeer
+  earliestTs:   null,           // for pagination
+  hasMore:      false,
+  dmSocket:     null,           // WebSocket for currentPeer
+  typingTimer:  null,
+  peerTyping:   false,
+  peerTypingTimeout: null,
+  totalUnread:  0,
+  conversations: [],
+};
+
+// ── Unread badge ──────────────────────────────────────────────────────────────
+function updateDMBadge(count) {
+  DM.totalUnread = count;
+  const badge = document.getElementById('dmUnreadBadge');
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : count;
+    badge.classList.add('visible');
+  } else {
+    badge.classList.remove('visible');
+  }
+}
+
+// ── Panel toggle ──────────────────────────────────────────────────────────────
+function toggleDMPanel(e) {
+  e.stopPropagation();
+  const panel = document.getElementById('dmPanel');
+  DM.panelOpen = !DM.panelOpen;
+  panel.classList.toggle('open', DM.panelOpen);
+  if (DM.panelOpen) loadDMConversations();
+}
+function closeDMPanel() {
+  DM.panelOpen = false;
+  document.getElementById('dmPanel').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  const panel = document.getElementById('dmPanel');
+  const btn   = document.getElementById('dmIconBtn');
+  if (!panel.contains(e.target) && !btn.contains(e.target)) closeDMPanel();
+});
+
+// ── Load conversations list ───────────────────────────────────────────────────
+async function loadDMConversations() {
+  try {
+    const res  = await fetch(`${Synapse.api}/dm/conversations`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    DM.conversations = data.conversations || [];
+    renderDMConversations();
+    const total = DM.conversations.reduce((s, c) => s + (c.unread || 0), 0);
+    updateDMBadge(total);
+  } catch {}
+}
+
+function renderDMConversations() {
+  const list  = document.getElementById('dmConvList');
+  const empty = document.getElementById('dmConvEmpty');
+  // Remove old conv items (keep empty placeholder)
+  [...list.querySelectorAll('.dm-conv-item')].forEach(el => el.remove());
+
+  if (!DM.conversations.length) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  for (const conv of DM.conversations) {
+    const item = document.createElement('div');
+    item.className = 'dm-conv-item';
+    item.onclick = () => { closeDMPanel(); openDMWindow(conv.peer, conv); };
+
+    // Avatar
+    const avatarEl = makeDMAvatarEl(conv.avatarUrl, conv.displayName, conv.color || Synapse.colorFor(conv.peer), 36);
+    avatarEl.className = 'dm-conv-avatar';
+
+    // Info
+    const info = document.createElement('div'); info.className = 'dm-conv-info';
+    const name = document.createElement('div'); name.className = 'dm-conv-name';
+    name.textContent = conv.displayName; name.style.color = conv.color || Synapse.colorFor(conv.peer);
+    const preview = document.createElement('div'); preview.className = 'dm-conv-preview';
+    const prefix = conv.lastFrom === username ? 'You: ' : '';
+    preview.textContent = prefix + (conv.lastMessage || '');
+    info.appendChild(name); info.appendChild(preview);
+
+    // Meta
+    const meta = document.createElement('div'); meta.className = 'dm-conv-meta';
+    const time = document.createElement('div'); time.className = 'dm-conv-time'; time.textContent = formatTime(conv.lastAt);
+    meta.appendChild(time);
+    if (conv.unread > 0) {
+      const badge = document.createElement('div'); badge.className = 'dm-conv-unread'; badge.textContent = conv.unread;
+      meta.appendChild(badge);
+    }
+
+    item.appendChild(avatarEl); item.appendChild(info); item.appendChild(meta);
+    list.appendChild(item);
+  }
+}
+
+function makeDMAvatarEl(avatarUrl, name, color, size) {
+  if (avatarUrl) {
+    const img = document.createElement('img');
+    img.src = avatarUrl;
+    img.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;`;
+    img.onerror = () => { img.replaceWith(makeDMAvatarEl('', name, color, size)); };
+    return img;
+  }
+  const ph = document.createElement('div');
+  ph.textContent = (name || '?').charAt(0).toUpperCase();
+  ph.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${size*0.42}px;font-weight:600;color:#fff;flex-shrink:0;`;
+  return ph;
+}
+
+// ── Compose DM modal ──────────────────────────────────────────────────────────
+function openComposeDM(prefillUser) {
+  closeDMPanel();
+  document.getElementById('dmComposeUser').value = prefillUser || '';
+  document.getElementById('dmComposeText').value = '';
+  document.getElementById('dmComposeError').textContent = '';
+  document.getElementById('dmComposeModal').classList.add('open');
+  document.getElementById(prefillUser ? 'dmComposeText' : 'dmComposeUser').focus();
+}
+function closeComposeDM() { document.getElementById('dmComposeModal').classList.remove('open'); }
+function handleComposeBackdrop(e) { if (e.target === document.getElementById('dmComposeModal')) closeComposeDM(); }
+
+async function sendComposeDM() {
+  const to   = document.getElementById('dmComposeUser').value.trim();
+  const text = document.getElementById('dmComposeText').value.trim();
+  const errEl = document.getElementById('dmComposeError');
+  errEl.textContent = '';
+  if (!to)   { errEl.textContent = 'Enter a username.'; return; }
+  if (!text) { errEl.textContent = 'Enter a message.'; return; }
+  if (to === username) { errEl.textContent = "You can't DM yourself."; return; }
+
+  try {
+    const res  = await fetch(`${Synapse.api}/dm/send`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, message: text }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Failed to send.'; return; }
+    closeComposeDM();
+    // Open the DM window with this peer
+    openDMWindow(to);
+  } catch { errEl.textContent = 'Network error.'; }
+}
+
+// ── DM window ─────────────────────────────────────────────────────────────────
+async function openDMWindow(peer, convData) {
+  if (DM.currentPeer === peer && document.getElementById('dmWindow').classList.contains('open')) return;
+
+  // Close previous WS
+  closeDMSocket();
+
+  DM.currentPeer = peer;
+  DM.messages    = [];
+  DM.earliestTs  = null;
+  DM.hasMore     = false;
+  DM.peerTyping  = false;
+
+  // Set header
+  const win = document.getElementById('dmWindow');
+  win.classList.remove('dm-window-minimised');
+  document.getElementById('dmWindowMessages').innerHTML = '';
+  document.getElementById('dmWindowInput').value = '';
+  document.getElementById('dmTypingLine').innerHTML = '';
+  document.getElementById('dmLoadMore').style.display = 'none';
+
+  // Peer profile — use convData if available, else fetch
+  if (convData) {
+    DM.peerProfile = convData;
+  } else {
+    try {
+      const r = await fetch(`${Synapse.api}/auth/profile/${encodeURIComponent(peer)}`, { headers: { Authorization: `Bearer ${token}` } });
+      DM.peerProfile = r.ok ? await r.json() : {};
+    } catch { DM.peerProfile = {}; }
+  }
+
+  const pColor = DM.peerProfile.color || Synapse.colorFor(peer);
+  const pName  = DM.peerProfile.displayName || peer;
+
+  // Window avatar + name
+  const avatarWrap = document.getElementById('dmWindowAvatar');
+  avatarWrap.innerHTML = '';
+  const av = makeDMAvatarEl(DM.peerProfile.avatarUrl || '', pName, pColor, 28);
+  av.className = 'dm-window-avatar';
+  avatarWrap.appendChild(av);
+  const nameEl = document.getElementById('dmWindowName');
+  nameEl.textContent = pName;
+  nameEl.style.color = pColor;
+
+  win.classList.add('open');
+
+  // Load history
+  await loadDMHistory(peer);
+
+  // Mark as read
+  await fetch(`${Synapse.api}/dm/read/${encodeURIComponent(peer)}`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}` },
+  }).catch(() => {});
+
+  // Update unread counts
+  const conv = DM.conversations.find(c => c.peer === peer);
+  if (conv) { conv.unread = 0; renderDMConversations(); }
+  const total = DM.conversations.reduce((s, c) => s + (c.unread || 0), 0);
+  updateDMBadge(total);
+
+  // Connect WS
+  openDMSocket(peer);
+  document.getElementById('dmWindowInput').focus();
+}
+
+function closeDMWindow() {
+  closeDMSocket();
+  DM.currentPeer = null;
+  document.getElementById('dmWindow').classList.remove('open');
+}
+
+function toggleDMMinimise() {
+  const win = document.getElementById('dmWindow');
+  const minimised = win.classList.toggle('dm-window-minimised');
+  document.getElementById('dmMinBtn').title = minimised ? 'Restore' : 'Minimise';
+  document.getElementById('dmMinBtn').textContent = minimised ? '▲' : '─';
+}
+
+// ── History loading ───────────────────────────────────────────────────────────
+async function loadDMHistory(peer, before) {
+  try {
+    let url = `${Synapse.api}/dm/messages/${encodeURIComponent(peer)}?limit=50`;
+    if (before) url += `&before=${before}`;
+    const res  = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    const msgs = data.messages || [];
+
+    if (before) {
+      // Prepend older messages
+      const container = document.getElementById('dmWindowMessages');
+      const oldScrollH = container.scrollHeight;
+      for (const m of msgs) appendDMMessage(m, true);
+      // Maintain scroll position
+      container.scrollTop = container.scrollHeight - oldScrollH;
+    } else {
+      DM.messages = msgs;
+      for (const m of msgs) appendDMMessage(m, false);
+      // Scroll to bottom
+      const container = document.getElementById('dmWindowMessages');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    if (msgs.length > 0) DM.earliestTs = msgs[0].sent_at;
+    DM.hasMore = msgs.length >= 50;
+    document.getElementById('dmLoadMore').style.display = DM.hasMore ? '' : 'none';
+  } catch {}
+}
+
+async function loadMoreDMs() {
+  if (!DM.currentPeer || !DM.earliestTs) return;
+  await loadDMHistory(DM.currentPeer, DM.earliestTs);
+}
+
+function appendDMMessage(msg, prepend = false) {
+  const container = document.getElementById('dmWindowMessages');
+  const isMine = msg.from_user === username;
+
+  const wrap = document.createElement('div');
+  wrap.className = `dm-msg ${isMine ? 'mine' : 'theirs'}`;
+  wrap.dataset.id = msg.id;
+
+  const bubble = document.createElement('div');
+  bubble.className = 'dm-msg-bubble';
+  bubble.textContent = msg.message;
+
+  const time = document.createElement('div');
+  time.className = 'dm-msg-time';
+  time.textContent = formatDateTime(msg.sent_at);
+
+  wrap.appendChild(bubble);
+  wrap.appendChild(time);
+
+  if (prepend) {
+    const firstMsg = container.querySelector('.dm-msg');
+    if (firstMsg) container.insertBefore(wrap, firstMsg);
+    else container.prepend(wrap);
+  } else {
+    container.appendChild(wrap);
+  }
+}
+
+// ── WebSocket for DM ──────────────────────────────────────────────────────────
+function openDMSocket(peer) {
+  closeDMSocket();
+  const wsBase = Synapse.api.replace(/^http/, 'ws');
+  const wsUrl  = `${wsBase}/dm/ws/${encodeURIComponent(peer)}?token=${encodeURIComponent(token)}`;
+  try {
+    DM.dmSocket = new WebSocket(wsUrl);
+    DM.dmSocket.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === 'dm_message' && data.from_user !== username) {
+          // Only display if it's from the peer we're chatting with
+          if (data.from_user === DM.currentPeer || data.to_user === DM.currentPeer) {
+            appendDMMessage(data, false);
+            const c = document.getElementById('dmWindowMessages');
+            c.scrollTop = c.scrollHeight;
+            // Mark as read immediately
+            fetch(`${Synapse.api}/dm/read/${encodeURIComponent(DM.currentPeer)}`, {
+              method: 'POST', headers: { Authorization: `Bearer ${token}` },
+            }).catch(() => {});
+          }
+        }
+        if (data.type === 'dm_typing' && data.from !== username) {
+          showDMTyping();
+        }
+      } catch {}
+    };
+    DM.dmSocket.onerror = () => {};
+    DM.dmSocket.onclose = () => {};
+  } catch {}
+}
+
+function closeDMSocket() {
+  if (DM.dmSocket) { try { DM.dmSocket.close(); } catch {} DM.dmSocket = null; }
+}
+
+function showDMTyping() {
+  clearTimeout(DM.peerTypingTimeout);
+  DM.peerTyping = true;
+  const tl = document.getElementById('dmTypingLine');
+  tl.innerHTML = `<span class="typing-dots"><span></span><span></span><span></span></span><span style="font-size:.64rem">${DM.peerProfile.displayName || DM.currentPeer} is typing…</span>`;
+  DM.peerTypingTimeout = setTimeout(() => {
+    DM.peerTyping = false;
+    document.getElementById('dmTypingLine').innerHTML = '';
+  }, 3000);
+}
+
+// ── Send DM ───────────────────────────────────────────────────────────────────
+async function sendDMFromWindow() {
+  const input = document.getElementById('dmWindowInput');
+  const text  = input.value.trim();
+  if (!text || !DM.currentPeer) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  try {
+    const res  = await fetch(`${Synapse.api}/dm/send`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: DM.currentPeer, message: text }),
+    });
+    const data = await res.json();
+    if (res.ok && data.message) {
+      appendDMMessage(data.message, false);
+      const c = document.getElementById('dmWindowMessages');
+      c.scrollTop = c.scrollHeight;
+      // Refresh conversations list in background
+      loadDMConversations();
+    }
+  } catch {}
+}
+
+// DM input auto-resize + typing indicator
+document.getElementById('dmWindowInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  if (DM.dmSocket?.readyState === WebSocket.OPEN) {
+    DM.dmSocket.send(JSON.stringify({ type: 'dm_typing' }));
+  }
+});
+document.getElementById('dmWindowInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendDMFromWindow(); }
+});
+
+// Compose modal keyboard
+document.getElementById('dmComposeText').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendComposeDM(); }
+});
+
+// Poll for unread count every 30 s when panel is closed
+setInterval(() => { if (!DM.panelOpen) loadDMConversations(); }, 30000);
+// Initial load for unread badge
+loadDMConversations();
 </script>
 </body>
 </html>
