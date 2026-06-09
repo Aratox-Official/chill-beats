@@ -59,7 +59,7 @@
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     /* -- Online sidebar -- */
-    .online-sidebar { grid-area: sidebar; background: var(--cream); border-left: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
+    .online-sidebar { grid-area: sidebar; grid-row: 1 / -1; background: var(--cream); border-left: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
     .online-sidebar::-webkit-scrollbar { width: 4px; }
     .online-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     .sidebar-header { padding: 14px 12px 6px; font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); flex-shrink: 0; }
