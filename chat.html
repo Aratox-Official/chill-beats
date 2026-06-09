@@ -23,10 +23,10 @@
     html, body { height: 100%; width: 100%; overflow: hidden; font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); transition: background 0.2s, color 0.2s; }
 
     /* -- App shell - sidebar on right -- */
-    .app { height: 100vh; width: 100vw; display: grid; grid-template-columns: 1fr 220px; grid-template-rows: auto auto 1fr auto auto; grid-template-areas: "header  sidebar" "status  sidebar" "chat    sidebar" "typing  sidebar" "input   sidebar"; }
+    .app { height: 100vh; width: 100vw; display: grid; grid-template-columns: 1fr 220px; grid-template-rows: auto auto 1fr auto auto; grid-template-areas: "header  header" "status  status" "chat    chat" "typing  typing" "input   input"; }
 
     /* -- Header -- */
-    header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; position: relative; }
+    header { grid-area: header; grid-column: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; position: relative; }
     .header-left { display: flex; align-items: baseline; gap: 10px; }
     .logo { font-family: 'DM Serif Display', serif; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--ink); }
     .room-tag { font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 2px 7px; border-radius: 2px; }
@@ -52,14 +52,14 @@
     /* Clear chat button - visibility controlled by JS in refreshHeader() */
 
     /* -- Status -- */
-    .status-bar { grid-area: status; padding: 3px 16px; font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: var(--cream); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+    .status-bar { grid-area: status; grid-column: 1; padding: 3px 16px; font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: var(--cream); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
     .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
     .status-dot.green { background: #4caf50; animation: blink 2.5s ease-in-out infinite; }
     .status-dot.red   { background: #e74c3c; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
     /* -- Online sidebar -- */
-    .online-sidebar { grid-area: sidebar; grid-row: 1 / -1; background: var(--cream); border-left: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
+    .online-sidebar { grid-column: 2; grid-row: 1 / 6; background: var(--cream); border-left: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
     .online-sidebar::-webkit-scrollbar { width: 4px; }
     .online-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     .sidebar-header { padding: 14px 12px 6px; font-family: 'DM Mono', monospace; font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); flex-shrink: 0; }
@@ -76,7 +76,7 @@
     .ou-badge { font-family: 'DM Mono', monospace; font-size: .55rem; letter-spacing: .08em; font-weight: 700; padding: 1px 5px; border-radius: 2px; display: inline-block; margin-top: 1px; }
 
     /* -- Messages -- */
-    #chat { grid-area: chat; overflow-y: auto; padding: 12px 0 4px; display: flex; flex-direction: column; min-height: 0; }
+    #chat { grid-area: chat; grid-column: 1; overflow-y: auto; padding: 12px 0 4px; display: flex; flex-direction: column; min-height: 0; }
     #chat::-webkit-scrollbar { width: 5px; }
     #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
@@ -116,7 +116,7 @@
     .msg-text { font-size: .9rem; line-height: 1.55; color: var(--ink); word-break: break-word; white-space: pre-wrap; }
 
     /* -- Typing -- */
-    #typingIndicator { grid-area: typing; height: 20px; padding: 0 16px 0 72px; font-size: .73rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    #typingIndicator { grid-area: typing; grid-column: 1; height: 20px; padding: 0 16px 0 72px; font-size: .73rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
     .typing-dots { display: inline-flex; gap: 3px; }
     .typing-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); animation: dotBounce 1.3s ease-in-out infinite; }
     .typing-dots span:nth-child(2) { animation-delay: .16s; }
@@ -124,7 +124,7 @@
     @keyframes dotBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
 
     /* -- Input -- */
-    .input-area { grid-area: input; padding: 0 16px 14px; }
+    .input-area { grid-area: input; grid-column: 1; padding: 0 16px 14px; }
     .input-box { display: flex; align-items: flex-end; gap: 8px; background: var(--cream); border: 1px solid var(--border); border-radius: 2px; padding: 0 12px; transition: border-color .15s, box-shadow .15s; }
     .input-box:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px var(--accent-dim); }
     #messageInput { flex: 1; font-family: 'DM Sans', sans-serif; font-size: .9rem; padding: 10px 0; background: none; border: none; color: var(--ink); outline: none; resize: none; min-height: 42px; max-height: 160px; line-height: 1.5; }
@@ -203,8 +203,9 @@
 
     /* -- Responsive -- */
     @media (max-width: 600px) {
-      .app { grid-template-columns: 1fr; grid-template-areas: "header" "status" "chat" "typing" "input"; }
+      .app { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr auto auto; }
       .online-sidebar { display: none; }
+      header, .status-bar, #chat, #typingIndicator, .input-area { grid-column: 1; }
     }
 
     /* ── DM Icon in header center ─────────────────────────────────────────── */
@@ -433,7 +434,7 @@
     <!-- DM icon — absolute center of header -->
     <div class="header-center">
       <button class="dm-icon-btn" id="dmIconBtn" onclick="toggleDMPanel(event)" title="Private Messages">
-        <img src="/chill-beats/chat-icon.png" alt="Private Messages">
+        <img src="/chat-icon.png" alt="Private Messages">
         <span class="dm-unread-badge" id="dmUnreadBadge"></span>
       </button>
     </div>
