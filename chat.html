@@ -1356,8 +1356,9 @@ function appendDMMessage(msg, prepend = false) {
 function openDMSocket(peer) {
   closeDMSocket();
   const wsBase = Synapse.api.replace(/^http/, 'ws');
-  // Split token at midpoint to avoid URL truncation issues with long JWTs
-  const wsUrl = `${wsBase}/dm/ws/${encodeURIComponent(peer)}?token=${encodeURIComponent(token)}`;
+  // Pass peer as a query param rather than a path segment to avoid
+  // issues with spaces or special chars in usernames breaking WS routing
+  const wsUrl = `${wsBase}/dm/ws/_?peer=${encodeURIComponent(peer)}&token=${encodeURIComponent(token)}`;
   try {
     const ws = new WebSocket(wsUrl);
     ws.onopen = () => { DM.dmSocket = ws; };
@@ -1455,10 +1456,10 @@ async function sendDMFromWindow() {
     });
     const data = await res.json();
     if (res.ok && data.message) {
+      _dmKnownIds.add(data.message.id); // prevent poll from re-appending
       appendDMMessage(data.message, false);
       const c = document.getElementById('dmWindowMessages');
       c.scrollTop = c.scrollHeight;
-      // Refresh conversations list in background
       loadDMConversations();
     }
   } catch {}
