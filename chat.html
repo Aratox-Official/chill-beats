@@ -56,8 +56,6 @@
     .dd-item:hover { background: var(--cream); color: var(--ink); }
     .dd-item.danger:hover { color: var(--danger); }
 
-    /* Clear chat button - visibility controlled by JS in refreshHeader() */
-
     /* -- Status -- */
     .status-bar { grid-column: 1; grid-row: 2; padding: 3px 16px; font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: var(--cream); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
     .status-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
@@ -215,7 +213,7 @@
       header, .status-bar, #chat, #typingIndicator, .input-area { grid-column: 1; }
     }
 
-    /* ── DM Icon in header center ─────────────────────────────────────────── */
+    /* -- DM Icon in header center ------------------------------------------- */
     .header-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; }
     .dm-icon-btn { background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 2px; transition: background .15s; position: relative; }
     .dm-icon-btn:hover { background: var(--cream); }
@@ -225,7 +223,7 @@
     .dm-unread-badge { position: absolute; top: -2px; right: -2px; background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: .52rem; font-weight: 700; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 3px; display: none; }
     .dm-unread-badge.visible { display: flex; }
 
-    /* ── DM Conversations panel (dropdown from icon) ───────────────────────── */
+    /* -- DM Conversations panel (dropdown from icon) ------------------------- */
     .dm-panel { position: fixed; top: 54px; left: 50%; transform: translateX(-50%); width: 320px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; box-shadow: 4px 4px 0 var(--border); z-index: 200; display: none; flex-direction: column; max-height: 480px; }
     .dm-panel.open { display: flex; }
     .dm-panel-header { padding: 12px 14px 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
@@ -247,7 +245,7 @@
     .dm-conv-unread { background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: .56rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
     .dm-empty { padding: 28px 14px; text-align: center; font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--muted); }
 
-    /* ── Compose DM modal ──────────────────────────────────────────────────── */
+    /* -- Compose DM modal ---------------------------------------------------- */
     .dm-compose-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 400; display: none; align-items: center; justify-content: center; }
     .dm-compose-modal.open { display: flex; }
     .dm-compose-card { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; width: min(340px, 92vw); box-shadow: 6px 6px 0 var(--border); animation: fadeUp .18s ease; }
@@ -264,7 +262,7 @@
     .dm-compose-send { font-family: 'DM Mono', monospace; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; padding: 10px; cursor: pointer; transition: background .15s; }
     .dm-compose-send:hover { background: var(--accent); }
 
-    /* ── DM chat window (floating bottom-right) ────────────────────────────── */
+    /* -- DM chat window (floating bottom-right) ------------------------------ */
     .dm-window { position: fixed; bottom: 16px; right: 16px; width: 320px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; box-shadow: 4px 4px 0 var(--border), 8px 8px 0 var(--accent-dim); z-index: 300; display: none; flex-direction: column; max-height: 460px; animation: fadeUp .18s ease; }
     .dm-window.open { display: flex; }
     .dm-window-header { padding: 10px 12px; background: var(--cream); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: default; }
@@ -382,7 +380,7 @@
   </div>
 </div>
 
-<!-- ── DM Conversations Panel ───────────────────────────────────────────── -->
+<!-- -- DM Conversations Panel --------------------------------------------- -->
 <div class="dm-panel" id="dmPanel">
   <div class="dm-panel-header">
     <span class="dm-panel-title">Messages</span>
@@ -393,7 +391,7 @@
   </div>
 </div>
 
-<!-- ── Compose DM Modal ─────────────────────────────────────────────────── -->
+<!-- -- Compose DM Modal --------------------------------------------------- -->
 <div class="dm-compose-modal" id="dmComposeModal" onclick="handleComposeBackdrop(event)">
   <div class="dm-compose-card">
     <div class="dm-compose-card-header">
@@ -415,13 +413,13 @@
   </div>
 </div>
 
-<!-- ── DM Chat Window (floating) ────────────────────────────────────────── -->
+<!-- -- DM Chat Window (floating) ------------------------------------------ -->
 <div class="dm-window" id="dmWindow">
   <div class="dm-window-header">
     <div id="dmWindowAvatar"></div>
     <span class="dm-window-name" id="dmWindowName"></span>
     <div class="dm-window-actions">
-      <button class="dm-window-btn" id="dmMinBtn" onclick="toggleDMMinimise()" title="Minimise">─</button>
+      <button class="dm-window-btn" id="dmMinBtn" onclick="toggleDMMinimise()" title="Minimise">-</button>
       <button class="dm-window-btn" onclick="closeDMWindow()" title="Close">✕</button>
     </div>
   </div>
@@ -440,7 +438,6 @@
       <span class="logo">Synapse</span>
     </div>
 
-    <!-- DM icon — absolute center of header -->
     <div class="header-center">
       <button class="dm-icon-btn" id="dmIconBtn" onclick="toggleDMPanel(event)" title="Private Messages">
         <img src="/chill-beats/chat-icon.png" alt="Private Messages">
@@ -519,9 +516,9 @@ let myAvatarUrl  = avatarUrl  || localStorage.getItem(`synapse_avatar_${username
 let pendingColor = myColor;
 let pendingAvatar = myAvatarUrl;
 
-const userProfiles = {}; // username → { color, avatarUrl, role }
+const userProfiles = {};
 const profileFetchCache = new Set();
-const msgElements = new Map(); // msgId → DOM element
+const msgElements = new Map();
 
 // --- DOM ----------------------------------------------------------------------
 const chat             = document.getElementById('chat');
@@ -582,14 +579,12 @@ function refreshHeader() {
   } else {
     roleEl.style.display = 'none';
   }
-  // Show clear chat + role section for staff
   const canClear = CAN_CLEAR.includes(role);
   document.getElementById('clearChatBtn').style.display = canClear ? 'flex' : 'none';
   document.getElementById('roleSection').style.display  = role === 'developer' ? 'flex' : 'none';
 }
 refreshHeader();
 
-// Fetch fresh profile from server
 (async () => {
   try {
     const res  = await fetch(`${Synapse.api}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -600,7 +595,6 @@ refreshHeader();
     userProfiles[username] = { color: myColor, avatarUrl: myAvatarUrl, role };
     refreshHeader();
     patchUserElements(username, myColor, myAvatarUrl);
-    // Update stored user
     Synapse.saveSession(token, { username, displayName: data.displayName || displayName, role, color: myColor, avatarUrl: myAvatarUrl });
   } catch {}
 })();
@@ -704,14 +698,12 @@ async function saveSettings() {
   fb.textContent = ''; fb.className = 'feedback';
 
   try {
-    // Save color
     await fetch(`${Synapse.api}/auth/color`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ color: pendingColor }),
     });
 
-    // Save avatar URL
     const avatarRes = await fetch(`${Synapse.api}/auth/avatar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -833,7 +825,6 @@ function renderOnlineList(users) {
   onlineCount.textContent = users.length;
   onlineList.innerHTML = '';
 
-  // Group by role order
   const order = ['developer', 'admin', 'moderator', 'vip', 'member'];
   users.sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role));
 
@@ -896,7 +887,6 @@ function handleRoleUpdate(data) {
     role = data.role;
     refreshHeader();
   }
-  // Update badges on existing messages
   const rm = ROLE_META[data.role] || ROLE_META.member;
   document.querySelectorAll(`.msg-badge[data-user="${data.username}"]`).forEach(el => {
     if (rm.label) { el.textContent = rm.label; el.style.background = rm.color + '22'; el.style.color = rm.color; el.style.display = 'inline'; }
@@ -955,7 +945,6 @@ function addMessage(data, isHistory) {
 
   lastAuthor = author; lastMsgTime = msgTime; lastIsHistory = isHistory;
 
-  // Use cached profile or fall back immediately; async will patch later
   const profile = userProfiles[author];
   const color   = profile?.color    || (isMine ? myColor : (data.color || Synapse.colorFor(author)));
   const avatar  = profile?.avatarUrl || (isMine ? myAvatarUrl : (data.avatarUrl || ''));
@@ -965,7 +954,6 @@ function addMessage(data, isHistory) {
   const group = document.createElement('div');
   group.className = ['msg-group', isContinued ? 'continued' : '', isHistory ? 'history-msg' : ''].filter(Boolean).join(' ');
 
-  // Delete button
   if (isMine) {
     const delBtn = document.createElement('button');
     delBtn.className = 'msg-delete'; delBtn.textContent = '✕ Delete';
@@ -973,7 +961,6 @@ function addMessage(data, isHistory) {
     group.appendChild(delBtn);
   }
 
-  // Avatar col
   const avatarCol = document.createElement('div'); avatarCol.className = 'msg-avatar-col';
   const miniTime = document.createElement('span'); miniTime.className = 'mini-time'; miniTime.textContent = formatTime(msgTime);
   avatarCol.appendChild(miniTime);
@@ -983,7 +970,6 @@ function addMessage(data, isHistory) {
     avatarCol.appendChild(slot);
   }
 
-  // Content col
   const contentCol = document.createElement('div'); contentCol.className = 'msg-content';
   if (!isContinued) {
     const header = document.createElement('div'); header.className = 'msg-header';
@@ -994,7 +980,6 @@ function addMessage(data, isHistory) {
       badgeEl.textContent = badge.label; badgeEl.style.background = badge.color + '22'; badgeEl.style.color = badge.color;
       header.appendChild(badgeEl);
     } else {
-      // Still render hidden badge so role updates can target it
       const badgeEl = document.createElement('span'); badgeEl.className = 'msg-badge'; badgeEl.dataset.user = author; badgeEl.style.display = 'none';
       header.appendChild(badgeEl);
     }
@@ -1012,7 +997,6 @@ function addMessage(data, isHistory) {
 
   if (atBottom || !isHistory) chat.scrollTop = chat.scrollHeight;
 
-  // Async profile resolution
   resolveProfile(author);
 }
 
@@ -1059,16 +1043,16 @@ function formatDateTime(ts) {
 }
 
 // =============================================================================
-// ── PRIVATE MESSAGES (DM) SYSTEM ─────────────────────────────────────────────
+// -- PRIVATE MESSAGES (DM) SYSTEM ---------------------------------------------
 // =============================================================================
 const DM = {
   panelOpen:    false,
-  currentPeer:  null,           // username of open DM window
-  peerProfile:  {},             // { displayName, color, avatarUrl }
-  messages:     [],             // loaded messages for currentPeer
-  earliestTs:   null,           // for pagination
+  currentPeer:  null,
+  peerProfile:  {},
+  messages:     [],
+  earliestTs:   null,
   hasMore:      false,
-  dmSocket:     null,           // WebSocket for currentPeer
+  dmSocket:     null,
   typingTimer:  null,
   peerTyping:   false,
   peerTypingTimeout: null,
@@ -1076,7 +1060,7 @@ const DM = {
   conversations: [],
 };
 
-// ── Unread badge ──────────────────────────────────────────────────────────────
+// -- Unread badge --------------------------------------------------------------
 function updateDMBadge(count) {
   DM.totalUnread = count;
   const badge = document.getElementById('dmUnreadBadge');
@@ -1088,7 +1072,7 @@ function updateDMBadge(count) {
   }
 }
 
-// ── Panel toggle ──────────────────────────────────────────────────────────────
+// -- Panel toggle --------------------------------------------------------------
 function toggleDMPanel(e) {
   e.stopPropagation();
   const panel = document.getElementById('dmPanel');
@@ -1106,7 +1090,7 @@ document.addEventListener('click', e => {
   if (!panel.contains(e.target) && !btn.contains(e.target)) closeDMPanel();
 });
 
-// ── Load conversations list ───────────────────────────────────────────────────
+// -- Load conversations list ---------------------------------------------------
 async function loadDMConversations() {
   try {
     const res  = await fetch(`${Synapse.api}/dm/conversations`, { headers: { Authorization: `Bearer ${token}` } });
@@ -1121,7 +1105,6 @@ async function loadDMConversations() {
 function renderDMConversations() {
   const list  = document.getElementById('dmConvList');
   const empty = document.getElementById('dmConvEmpty');
-  // Remove old conv items (keep empty placeholder)
   [...list.querySelectorAll('.dm-conv-item')].forEach(el => el.remove());
 
   if (!DM.conversations.length) { empty.style.display = ''; return; }
@@ -1132,11 +1115,9 @@ function renderDMConversations() {
     item.className = 'dm-conv-item';
     item.onclick = () => { closeDMPanel(); openDMWindow(conv.peer, conv); };
 
-    // Avatar
     const avatarEl = makeDMAvatarEl(conv.avatarUrl, conv.displayName, conv.color || Synapse.colorFor(conv.peer), 36);
     avatarEl.className = 'dm-conv-avatar';
 
-    // Info
     const info = document.createElement('div'); info.className = 'dm-conv-info';
     const name = document.createElement('div'); name.className = 'dm-conv-name';
     name.textContent = conv.displayName; name.style.color = conv.color || Synapse.colorFor(conv.peer);
@@ -1145,7 +1126,6 @@ function renderDMConversations() {
     preview.textContent = prefix + (conv.lastMessage || '');
     info.appendChild(name); info.appendChild(preview);
 
-    // Meta
     const meta = document.createElement('div'); meta.className = 'dm-conv-meta';
     const time = document.createElement('div'); time.className = 'dm-conv-time'; time.textContent = formatTime(conv.lastAt);
     meta.appendChild(time);
@@ -1173,7 +1153,7 @@ function makeDMAvatarEl(avatarUrl, name, color, size) {
   return ph;
 }
 
-// ── Compose DM modal ──────────────────────────────────────────────────────────
+// -- Compose DM modal ----------------------------------------------------------
 function openComposeDM(prefillUser) {
   closeDMPanel();
   document.getElementById('dmComposeUser').value = prefillUser || '';
@@ -1203,16 +1183,14 @@ async function sendComposeDM() {
     const data = await res.json();
     if (!res.ok) { errEl.textContent = data.error || 'Failed to send.'; return; }
     closeComposeDM();
-    // Open the DM window with this peer
     openDMWindow(to);
   } catch { errEl.textContent = 'Network error.'; }
 }
 
-// ── DM window ─────────────────────────────────────────────────────────────────
+// -- DM window -----------------------------------------------------------------
 async function openDMWindow(peer, convData) {
   if (DM.currentPeer === peer && document.getElementById('dmWindow').classList.contains('open')) return;
 
-  // Close previous WS + stop polling
   closeDMSocket();
   stopDMPolling();
 
@@ -1222,7 +1200,6 @@ async function openDMWindow(peer, convData) {
   DM.hasMore     = false;
   DM.peerTyping  = false;
 
-  // Set header
   const win = document.getElementById('dmWindow');
   win.classList.remove('dm-window-minimised');
   document.getElementById('dmWindowMessages').innerHTML = '';
@@ -1230,7 +1207,6 @@ async function openDMWindow(peer, convData) {
   document.getElementById('dmTypingLine').innerHTML = '';
   document.getElementById('dmLoadMore').style.display = 'none';
 
-  // Peer profile — use convData if available, else fetch
   if (convData) {
     DM.peerProfile = convData;
   } else {
@@ -1243,7 +1219,6 @@ async function openDMWindow(peer, convData) {
   const pColor = DM.peerProfile.color || Synapse.colorFor(peer);
   const pName  = DM.peerProfile.displayName || peer;
 
-  // Window avatar + name
   const avatarWrap = document.getElementById('dmWindowAvatar');
   avatarWrap.innerHTML = '';
   const av = makeDMAvatarEl(DM.peerProfile.avatarUrl || '', pName, pColor, 28);
@@ -1255,21 +1230,17 @@ async function openDMWindow(peer, convData) {
 
   win.classList.add('open');
 
-  // Load history
   await loadDMHistory(peer);
 
-  // Mark as read
   await fetch(`${Synapse.api}/dm/read/${encodeURIComponent(peer)}`, {
     method: 'POST', headers: { Authorization: `Bearer ${token}` },
   }).catch(() => {});
 
-  // Update unread counts
   const conv = DM.conversations.find(c => c.peer === peer);
   if (conv) { conv.unread = 0; renderDMConversations(); }
   const total = DM.conversations.reduce((s, c) => s + (c.unread || 0), 0);
   updateDMBadge(total);
 
-  // Connect WS (typing indicators only) + start polling
   openDMSocket(peer);
   startDMPolling(peer);
   document.getElementById('dmWindowInput').focus();
@@ -1286,10 +1257,10 @@ function toggleDMMinimise() {
   const win = document.getElementById('dmWindow');
   const minimised = win.classList.toggle('dm-window-minimised');
   document.getElementById('dmMinBtn').title = minimised ? 'Restore' : 'Minimise';
-  document.getElementById('dmMinBtn').textContent = minimised ? '▲' : '─';
+  document.getElementById('dmMinBtn').textContent = minimised ? '▲' : '-';
 }
 
-// ── History loading ───────────────────────────────────────────────────────────
+// -- History loading -----------------------------------------------------------
 async function loadDMHistory(peer, before) {
   try {
     let url = `${Synapse.api}/dm/messages/${encodeURIComponent(peer)}?limit=50`;
@@ -1299,16 +1270,13 @@ async function loadDMHistory(peer, before) {
     const msgs = data.messages || [];
 
     if (before) {
-      // Prepend older messages
       const container = document.getElementById('dmWindowMessages');
       const oldScrollH = container.scrollHeight;
       for (const m of msgs) appendDMMessage(m, true);
-      // Maintain scroll position
       container.scrollTop = container.scrollHeight - oldScrollH;
     } else {
       DM.messages = msgs;
       for (const m of msgs) appendDMMessage(m, false);
-      // Scroll to bottom
       const container = document.getElementById('dmWindowMessages');
       container.scrollTop = container.scrollHeight;
     }
@@ -1352,12 +1320,10 @@ function appendDMMessage(msg, prepend = false) {
   }
 }
 
-// ── WebSocket for DM ──────────────────────────────────────────────────────────
+// -- WebSocket for DM ----------------------------------------------------------
 function openDMSocket(peer) {
   closeDMSocket();
   const wsBase = Synapse.api.replace(/^http/, 'ws');
-  // Pass peer as a query param rather than a path segment to avoid
-  // issues with spaces or special chars in usernames breaking WS routing
   const wsUrl = `${wsBase}/dm/ws/_?peer=${encodeURIComponent(peer)}&token=${encodeURIComponent(token)}`;
   try {
     const ws = new WebSocket(wsUrl);
@@ -1377,9 +1343,7 @@ function closeDMSocket() {
   if (DM.dmSocket) { try { DM.dmSocket.close(); } catch {} DM.dmSocket = null; }
 }
 
-// ── Polling for incoming DMs (reliable real-time delivery) ────────────────────
-// Polls every 2.5s while a DM window is open; compares latest message ID
-// so we never show duplicates.
+// -- Polling for incoming DMs (reliable real-time delivery) --------------------
 let _dmPollInterval  = null;
 let _dmKnownIds      = new Set();
 
@@ -1409,7 +1373,6 @@ async function pollDMMessages(peer) {
       _dmKnownIds.add(m.id);
       appendDMMessage(m, false);
       appended = true;
-      // If it's incoming, mark as read & refresh unread badge
       if (m.from_user !== username) {
         fetch(`${Synapse.api}/dm/read/${encodeURIComponent(peer)}`, {
           method: 'POST', headers: { Authorization: `Bearer ${token}` },
@@ -1423,7 +1386,7 @@ async function pollDMMessages(peer) {
     if (appended) {
       const c = document.getElementById('dmWindowMessages');
       c.scrollTop = c.scrollHeight;
-      loadDMConversations(); // refresh sidebar preview
+      loadDMConversations();
     }
   } catch {}
 }
@@ -1439,7 +1402,7 @@ function showDMTyping() {
   }, 3000);
 }
 
-// ── Send DM ───────────────────────────────────────────────────────────────────
+// -- Send DM -------------------------------------------------------------------
 async function sendDMFromWindow() {
   const input = document.getElementById('dmWindowInput');
   const text  = input.value.trim();
@@ -1456,7 +1419,7 @@ async function sendDMFromWindow() {
     });
     const data = await res.json();
     if (res.ok && data.message) {
-      _dmKnownIds.add(data.message.id); // prevent poll from re-appending
+      _dmKnownIds.add(data.message.id);
       appendDMMessage(data.message, false);
       const c = document.getElementById('dmWindowMessages');
       c.scrollTop = c.scrollHeight;
@@ -1465,7 +1428,6 @@ async function sendDMFromWindow() {
   } catch {}
 }
 
-// DM input auto-resize + typing indicator
 document.getElementById('dmWindowInput').addEventListener('input', function() {
   this.style.height = 'auto';
   this.style.height = Math.min(this.scrollHeight, 100) + 'px';
@@ -1477,14 +1439,11 @@ document.getElementById('dmWindowInput').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendDMFromWindow(); }
 });
 
-// Compose modal keyboard
 document.getElementById('dmComposeText').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendComposeDM(); }
 });
 
-// Poll for unread count every 30 s when panel is closed
 setInterval(() => { if (!DM.panelOpen) loadDMConversations(); }, 30000);
-// Initial load for unread badge
 loadDMConversations();
 </script>
 </body>
