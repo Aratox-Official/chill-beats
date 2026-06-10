@@ -33,7 +33,7 @@
     }
 
     /* -- Header -- */
-    header { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; position: relative; overflow: hidden; }
+    header { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; position: relative; z-index: 10; /* overflow: hidden; */ }
     .header-left { display: flex; align-items: baseline; gap: 10px; }
     .logo { font-family: 'DM Serif Display', serif; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--ink); }
     .room-tag { font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 2px 7px; border-radius: 2px; }
