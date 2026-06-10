@@ -33,7 +33,7 @@
     }
 
     /* -- Header -- */
-    header { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; position: relative; z-index: 10; /* overflow: hidden; */ }
+    header { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 10px; position: relative; overflow: hidden; }
     .header-left { display: flex; align-items: baseline; gap: 10px; }
     .logo { font-family: 'DM Serif Display', serif; font-size: 1.35rem; letter-spacing: -0.02em; color: var(--ink); }
     .room-tag { font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 2px 7px; border-radius: 2px; }
@@ -1212,8 +1212,9 @@ async function sendComposeDM() {
 async function openDMWindow(peer, convData) {
   if (DM.currentPeer === peer && document.getElementById('dmWindow').classList.contains('open')) return;
 
-  // Close previous WS
+  // Close previous WS + stop polling
   closeDMSocket();
+  stopDMPolling();
 
   DM.currentPeer = peer;
   DM.messages    = [];
@@ -1268,13 +1269,15 @@ async function openDMWindow(peer, convData) {
   const total = DM.conversations.reduce((s, c) => s + (c.unread || 0), 0);
   updateDMBadge(total);
 
-  // Connect WS
+  // Connect WS (typing indicators only) + start polling
   openDMSocket(peer);
+  startDMPolling(peer);
   document.getElementById('dmWindowInput').focus();
 }
 
 function closeDMWindow() {
   closeDMSocket();
+  stopDMPolling();
   DM.currentPeer = null;
   document.getElementById('dmWindow').classList.remove('open');
 }
@@ -1353,36 +1356,75 @@ function appendDMMessage(msg, prepend = false) {
 function openDMSocket(peer) {
   closeDMSocket();
   const wsBase = Synapse.api.replace(/^http/, 'ws');
-  const wsUrl  = `${wsBase}/dm/ws/${encodeURIComponent(peer)}?token=${encodeURIComponent(token)}`;
+  // Split token at midpoint to avoid URL truncation issues with long JWTs
+  const wsUrl = `${wsBase}/dm/ws/${encodeURIComponent(peer)}?token=${encodeURIComponent(token)}`;
   try {
-    DM.dmSocket = new WebSocket(wsUrl);
-    DM.dmSocket.onmessage = (e) => {
+    const ws = new WebSocket(wsUrl);
+    ws.onopen = () => { DM.dmSocket = ws; };
+    ws.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data);
-        if (data.type === 'dm_message' && data.from_user !== username) {
-          // Only display if it's from the peer we're chatting with
-          if (data.from_user === DM.currentPeer || data.to_user === DM.currentPeer) {
-            appendDMMessage(data, false);
-            const c = document.getElementById('dmWindowMessages');
-            c.scrollTop = c.scrollHeight;
-            // Mark as read immediately
-            fetch(`${Synapse.api}/dm/read/${encodeURIComponent(DM.currentPeer)}`, {
-              method: 'POST', headers: { Authorization: `Bearer ${token}` },
-            }).catch(() => {});
-          }
-        }
-        if (data.type === 'dm_typing' && data.from !== username) {
-          showDMTyping();
-        }
+        if (data.type === 'dm_typing' && data.from !== username) showDMTyping();
       } catch {}
     };
-    DM.dmSocket.onerror = () => {};
-    DM.dmSocket.onclose = () => {};
-  } catch {}
+    ws.onerror  = () => { DM.dmSocket = null; };
+    ws.onclose  = () => { DM.dmSocket = null; };
+  } catch { DM.dmSocket = null; }
 }
 
 function closeDMSocket() {
   if (DM.dmSocket) { try { DM.dmSocket.close(); } catch {} DM.dmSocket = null; }
+}
+
+// ── Polling for incoming DMs (reliable real-time delivery) ────────────────────
+// Polls every 2.5s while a DM window is open; compares latest message ID
+// so we never show duplicates.
+let _dmPollInterval  = null;
+let _dmKnownIds      = new Set();
+
+function startDMPolling(peer) {
+  stopDMPolling();
+  _dmKnownIds = new Set(DM.messages.map(m => m.id));
+  _dmPollInterval = setInterval(() => pollDMMessages(peer), 2500);
+}
+
+function stopDMPolling() {
+  if (_dmPollInterval) { clearInterval(_dmPollInterval); _dmPollInterval = null; }
+  _dmKnownIds.clear();
+}
+
+async function pollDMMessages(peer) {
+  if (!peer || peer !== DM.currentPeer) { stopDMPolling(); return; }
+  try {
+    const res  = await fetch(`${Synapse.api}/dm/messages/${encodeURIComponent(peer)}?limit=50`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const msgs = data.messages || [];
+    let appended = false;
+    for (const m of msgs) {
+      if (_dmKnownIds.has(m.id)) continue;
+      _dmKnownIds.add(m.id);
+      appendDMMessage(m, false);
+      appended = true;
+      // If it's incoming, mark as read & refresh unread badge
+      if (m.from_user !== username) {
+        fetch(`${Synapse.api}/dm/read/${encodeURIComponent(peer)}`, {
+          method: 'POST', headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+        const conv = DM.conversations.find(c => c.peer === peer);
+        if (conv) { conv.unread = 0; }
+        const total = DM.conversations.reduce((s, c) => s + (c.unread || 0), 0);
+        updateDMBadge(total);
+      }
+    }
+    if (appended) {
+      const c = document.getElementById('dmWindowMessages');
+      c.scrollTop = c.scrollHeight;
+      loadDMConversations(); // refresh sidebar preview
+    }
+  } catch {}
 }
 
 function showDMTyping() {
