@@ -320,6 +320,14 @@
         </div>
       </div>
 
+      <!-- Display name -->
+      <div class="setting-row">
+        <div class="setting-label">Display name</div>
+        <input class="setting-input" id="displayNameInput" type="text" placeholder="Your display name" maxlength="64" autocomplete="off">
+        <div class="setting-hint">This is the name shown on your messages. Your login tag (@<!-- -->username) cannot be changed.</div>
+        <div class="feedback" id="displayNameFeedback"></div>
+      </div>
+
       <!-- Avatar URL -->
       <div class="setting-row">
         <div class="setting-label">Profile picture</div>
@@ -677,9 +685,11 @@ function openSettings() {
   dropdown.classList.remove('open');
   pendingColor  = myColor;
   pendingAvatar = myAvatarUrl;
-  document.getElementById('avatarUrlInput').value = myAvatarUrl;
-  document.getElementById('avatarFeedback').textContent = '';
-  document.getElementById('roleFeedback').textContent   = '';
+  document.getElementById('avatarUrlInput').value     = myAvatarUrl;
+  document.getElementById('displayNameInput').value   = displayName || username;
+  document.getElementById('avatarFeedback').textContent      = '';
+  document.getElementById('displayNameFeedback').textContent = '';
+  document.getElementById('roleFeedback').textContent        = '';
   themeToggle.classList.toggle('on', currentTheme === 'dark');
   buildSwatches();
   document.getElementById('customColor').value = myColor;
@@ -694,16 +704,47 @@ function handleBackdropClick(e) { if (e.target === settingsBackdrop) closeSettin
 async function saveSettings() {
   const btn = document.getElementById('saveBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
-  const fb = document.getElementById('avatarFeedback');
+  const fb   = document.getElementById('avatarFeedback');
+  const dnFb = document.getElementById('displayNameFeedback');
   fb.textContent = ''; fb.className = 'feedback';
+  dnFb.textContent = ''; dnFb.className = 'feedback';
+
+  const newDisplayName = document.getElementById('displayNameInput').value.trim();
+  if (!newDisplayName) {
+    dnFb.textContent = 'Display name cannot be empty.'; dnFb.className = 'feedback err';
+    btn.disabled = false; btn.textContent = 'Save'; return;
+  }
+  if (newDisplayName.length > 64) {
+    dnFb.textContent = 'Display name must be 64 characters or fewer.'; dnFb.className = 'feedback err';
+    btn.disabled = false; btn.textContent = 'Save'; return;
+  }
 
   try {
+    // Save display name if changed
+    if (newDisplayName !== displayName) {
+      const dnRes = await fetch(`${Synapse.api}/auth/display-name`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ displayName: newDisplayName }),
+      });
+      if (!dnRes.ok) {
+        const d = await dnRes.json();
+        dnFb.textContent = d.error || 'Failed to update display name.'; dnFb.className = 'feedback err';
+        btn.disabled = false; btn.textContent = 'Save'; return;
+      }
+      displayName = newDisplayName;
+      const stored = Synapse.getUser();
+      Synapse.saveSession(token, { ...stored, displayName });
+    }
+
+    // Save colour
     await fetch(`${Synapse.api}/auth/color`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ color: pendingColor }),
     });
 
+    // Save avatar
     const avatarRes = await fetch(`${Synapse.api}/auth/avatar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -799,7 +840,8 @@ function connect() {
     if (data.type === 'delete')       { handleRemoteDelete(data.msgId); return; }
     if (data.type === 'chat_cleared') { handleChatCleared(data.clearedBy); return; }
     if (data.type === 'role_update')  { handleRoleUpdate(data); return; }
-    if (data.type === 'avatar_update'){ handleAvatarUpdate(data); return; }
+    if (data.type === 'avatar_update')     { handleAvatarUpdate(data); return; }
+    if (data.type === 'displayname_update') { handleDisplayNameUpdate(data); return; }
     addMessage(data, false);
     if (data.username && data.username !== username && document.hidden && Notification.permission === 'granted') {
       new Notification(`Synapse · ${data.displayName || data.username}`, { body: data.message, silent: true });
@@ -899,6 +941,19 @@ function handleAvatarUpdate(data) {
   if (userProfiles[data.username]) userProfiles[data.username].avatarUrl = data.avatarUrl;
   if (data.username === username) { myAvatarUrl = data.avatarUrl; refreshHeader(); }
   patchUserElements(data.username, userProfiles[data.username]?.color || Synapse.colorFor(data.username), data.avatarUrl);
+}
+
+// --- Display name update ------------------------------------------------------
+function handleDisplayNameUpdate(data) {
+  if (userProfiles[data.username]) userProfiles[data.username].displayName = data.displayName;
+  if (data.username === username) {
+    displayName = data.displayName;
+    refreshHeader();
+  }
+  // Patch all existing message author labels for this user
+  document.querySelectorAll(`.msg-author[data-user="${data.username}"]`).forEach(el => {
+    el.textContent = data.displayName;
+  });
 }
 
 // --- Delete -------------------------------------------------------------------
