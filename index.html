@@ -6,6 +6,7 @@
   <title>Synapse - Sign In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -90,6 +91,8 @@
 
     <div class="error" id="errorMsg"></div>
 
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAC8_0cGJkZVDYH61" data-theme="light" id="turnstile" style="margin-bottom:12px;"></div>
+
     <button class="btn" id="loginBtn" onclick="login()">Sign In →</button>
   </div>
 
@@ -123,21 +126,25 @@
     const password = passwordEl.value;
     if (!username || !password) { setError('Please fill in all fields.'); return; }
 
+    const token = turnstile.getResponse();
+    if (!token) { setError('Please complete the security check.'); return; }
+
     setLoading(true);
     try {
       const res  = await fetch(`${Synapse.api}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, cfTurnstileResponse: token }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || 'Login failed.'); setLoading(false); return; }
+      if (!res.ok) { setError(data.error || 'Login failed.'); setLoading(false); turnstile.reset(); return; }
 
       Synapse.saveSession(data.token, { username: data.username, displayName: data.displayName, role: data.role || 'member', color: data.color || null, avatarUrl: data.avatarUrl || null });
       window.location.href = 'chat.html';
     } catch {
       setError('Network error - please try again.');
       setLoading(false);
+      turnstile.reset();
     }
   }
 
