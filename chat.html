@@ -1048,7 +1048,8 @@ function addMessage(data, isHistory) {
   const group = document.createElement('div');
   group.className = ['msg-group', isContinued ? 'continued' : '', isHistory ? 'history-msg' : ''].filter(Boolean).join(' ');
 
-  if (isMine) {
+  const canDelete = isMine || role === 'developer' || role === 'admin';
+  if (canDelete) {
     const delBtn = document.createElement('button');
     delBtn.className = 'msg-delete'; delBtn.textContent = '✕ Delete';
     delBtn.onclick = () => deleteMessage(msgId, group);
