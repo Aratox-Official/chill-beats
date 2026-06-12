@@ -292,6 +292,38 @@
     .dm-window-minimised .dm-window-messages,
     .dm-window-minimised .dm-window-input-row,
     .dm-window-minimised .dm-typing-line { display: none; }
+
+    /* -- Sidebar toggle button -- */
+    .sidebar-toggle-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 7px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      border-radius: 2px;
+      transition: background .15s;
+      flex-shrink: 0;
+      margin-bottom: 7px;
+      align-self: flex-end;
+    }
+    .sidebar-toggle-btn:hover { background: var(--border); }
+    .sidebar-toggle-btn span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--muted);
+      border-radius: 1px;
+      transition: background .15s;
+    }
+    .sidebar-toggle-btn:hover span { background: var(--ink); }
+    .sidebar-toggle-btn.active span { background: var(--accent); }
+
+    /* Sidebar hidden state */
+    .app.sidebar-hidden { grid-template-columns: 1fr 0px; }
+    .app.sidebar-hidden .online-sidebar { display: none; }
   </style>
 </head>
 <body>
@@ -481,9 +513,16 @@
   <div id="typingIndicator"></div>
 
   <div class="input-area">
-    <div class="input-box">
-      <textarea id="messageInput" placeholder="Type here..." maxlength="2000" rows="1" autocomplete="off" spellcheck="true"></textarea>
-      <button class="send-btn" onclick="sendMessage()">Send</button>
+    <div style="display:flex;align-items:flex-end;gap:8px">
+      <div class="input-box" style="flex:1">
+        <textarea id="messageInput" placeholder="Type here..." maxlength="2000" rows="1" autocomplete="off" spellcheck="true"></textarea>
+        <button class="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+      <button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleOnlineSidebar()" title="Toggle user list">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
     <div class="input-footer">
       <span>Shift+Enter for new line</span>
@@ -1500,6 +1539,15 @@ document.getElementById('dmComposeText').addEventListener('keydown', e => {
 
 setInterval(() => { if (!DM.panelOpen) loadDMConversations(); }, 30000);
 loadDMConversations();
+
+// -- Sidebar toggle ------------------------------------------------------------
+function toggleOnlineSidebar() {
+  const app = document.querySelector('.app');
+  const btn = document.getElementById('sidebarToggleBtn');
+  const hidden = app.classList.toggle('sidebar-hidden');
+  btn.classList.toggle('active', hidden);
+  btn.title = hidden ? 'Show user list' : 'Hide user list';
+}
 </script>
 </body>
 </html>
