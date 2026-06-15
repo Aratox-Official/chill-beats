@@ -24,7 +24,7 @@
 
     /* -- App shell -- */
     .app {
-      height: 100vh;
+      height: 100vh; height: 100dvh;
       width: 100vw;
       overflow: hidden;
       display: grid;
@@ -211,6 +211,14 @@
       .app { grid-template-columns: 1fr; }
       .online-sidebar { display: none; }
       header, .status-bar, #chat, #typingIndicator, .input-area { grid-column: 1; }
+    }
+
+    /* -- Mobile viewport fix --
+       On Android (Galaxy Z Fold 4, etc.) and iOS, 100vh includes the browser chrome
+       (address bar, nav bar), so the bottom rows of the grid get clipped off-screen.
+       100dvh (dynamic viewport height) always reflects the true visible area. */
+    @supports (height: 100dvh) {
+      .app { height: 100dvh; }
     }
 
     /* -- DM Icon in header center ------------------------------------------- */
