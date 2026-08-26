@@ -6,7 +6,6 @@
   <title>Synapse - Create Account</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -111,8 +110,6 @@
 
     <div class="error" id="errorMsg"></div>
 
-    <div class="cf-turnstile" data-sitekey="0x4AAAAAAC8_0cGJkZVDYH61" data-theme="light" id="turnstile" style="margin-bottom:12px;"></div>
-
     <button class="btn" id="registerBtn" onclick="register()">Create Account →</button>
   </div>
 
@@ -165,18 +162,15 @@
     if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
     if (password !== confirm) { setError('Passwords do not match.'); return; }
 
-    const token = turnstile.getResponse();
-    if (!token) { setError('Please complete the security check.'); return; }
-
     setLoading(true);
     try {
       const res  = await fetch(`${Synapse.api}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, displayName: displayName || username, cfTurnstileResponse: token }),
+        body: JSON.stringify({ username, password, displayName: displayName || username }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || 'Registration failed.'); setLoading(false); turnstile.reset(); return; }
+      if (!res.ok) { setError(data.error || 'Registration failed.'); setLoading(false); return; }
 
       Synapse.saveSession(data.token, { username: data.username, displayName: data.displayName, role: data.role || 'member', color: data.color || null, avatarUrl: data.avatarUrl || null });
       setSuccess('Account created! Redirecting…');
@@ -184,7 +178,6 @@
     } catch {
       setError('Network error - please try again.');
       setLoading(false);
-      turnstile.reset();
     }
   }
 
