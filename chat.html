@@ -232,7 +232,7 @@
     .dm-unread-badge.visible { display: flex; }
 
     /* -- DM Conversations panel (dropdown from icon) ------------------------- */
-    .dm-panel { position: fixed; top: 54px; left: 50%; transform: translateX(-50%); width: 320px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; box-shadow: 4px 4px 0 var(--border); z-index: 200; display: none; flex-direction: column; max-height: 480px; }
+    .dm-panel { position: fixed; top: 54px; right: 16px; width: 320px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; box-shadow: 4px 4px 0 var(--border); z-index: 200; display: none; flex-direction: column; max-height: 480px; }
     .dm-panel.open { display: flex; }
     .dm-panel-header { padding: 12px 14px 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
     .dm-panel-title { font-family: 'DM Serif Display', serif; font-size: .95rem; font-weight: 400; }
@@ -494,6 +494,10 @@
     </div>
 
     <div class="header-right">
+      <button class="dm-icon-btn" id="dmIconBtn" onclick="toggleDMPanel(event)" title="Private Messages">
+        <img src="/chill-beats/chat-icon.png" alt="Private Messages">
+        <span class="dm-unread-badge" id="dmUnreadBadge"></span>
+      </button>
       <div class="user-chip" id="userChip" onclick="toggleDropdown()">
         <div id="chipAvatarWrap"></div>
         <span id="chipName"></span>
